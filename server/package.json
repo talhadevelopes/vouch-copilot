@@ -1,0 +1,17 @@
+{
+  "name": "vouch-server",
+  "version": "0.1.0",
+  "module": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "bun --watch src/index.ts"
+  },
+  "devDependencies": {
+    "bun-types": "latest"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@upstash/redis": "^1.37.0",
+    "hono": "^4.0.0"
+  }
+}
