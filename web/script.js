@@ -95,7 +95,6 @@ window.goToImage = (idx) => {
     mainShotView.classList.remove('fading');
     isFading = false;
   }, 200);
-  
   resetAutoPlay();
 };
 
