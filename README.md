@@ -1,5 +1,7 @@
 # Vouch Web Copilot
 
+**🌐 Live Demo:** [https://vouch-copilot.vercel.app](https://vouch-copilot.vercel.app)
+
 Vouch is a Chrome extension that acts as your intelligent AI copilot while you read articles online. It doesn't just check facts — it serves as a full conversational assistant that can summarize pages, answer specific questions about what you are reading, and analyze the content for bias and manipulation.
 
 ## The Problem
