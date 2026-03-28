@@ -134,10 +134,7 @@ async function init() {
 
   chrome.runtime.sendMessage({ type: "PAGE_EXTRACTED", payload: pageData }, () => {
     if (chrome.runtime.lastError) {
-      console.error(
-        "[Vouch Content] Error sending PAGE_EXTRACTED:",
-        chrome.runtime.lastError,
-      );
+      
     }
   });
 
