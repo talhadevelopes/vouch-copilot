@@ -1,5 +1,8 @@
 FROM oven/bun:1.2
 
+# Install OpenSSL 1.1 for Prisma
+RUN apt-get update -y && apt-get install -y openssl
+
 WORKDIR /app
 
 COPY package.json bun.lock ./
