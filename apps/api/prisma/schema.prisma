@@ -32,15 +32,20 @@ model RefreshToken {
 }
 
 model Analysis {
-  id        String   @id
-  userId    String   @map("user_id")
-  inputUrl  String   @map("input_url")
-  aiResponse String? @map("ai_response")
-  proof     String?
-  biasScore Int?     @map("bias_score")
-  shareId   String?  @unique @map("share_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String   @id
+  userId       String   @map("user_id")
+  inputUrl     String   @map("input_url")
+  pageTitle    String?  @map("page_title")
+  aiResponse   String?  @map("ai_response")
+  proof        String?
+  biasScore    Int?     @map("bias_score")
+  claimsData   Json?    @map("claims_data")
+  biasData     Json?    @map("bias_data")
+  chatHistory  Json?    @map("chat_history")
+  vouchHistory Json?    @map("vouch_history")
+  shareId      String?  @unique @map("share_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt(sort: Desc)])
   @@map("analyses")

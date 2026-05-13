@@ -108,5 +108,5 @@ export function highlightText(textToHighlight: string) {
       parent.removeChild(span);
       parent.normalize();
     }, 1000);
-  }, 50000);
+  }, 5000);
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { CredibilityPanel } from './components/CredibilityPanel';
 import { BiasPanel } from './components/BiasPanel';
 import { ChatPanel } from './components/ChatPanel';
@@ -8,13 +8,13 @@ import { SettingsPanel } from './components/SettingsPanel';
 import { usePageData } from './hooks/usePageData';
 import { useVerification } from './hooks/useVerification';
 import { useClaimStream } from './hooks/useClaimStream';
-import { saveHistory } from './hooks/useHistory';
+import { saveHistory, saveScanToHistory, type HistoryEntry } from './hooks/useHistory';
 import type { Tab, ChatMessage } from './utils/types';
 import { DEFAULT_TAB, TAB_LABEL } from './utils/constants';
 import { useSidebarUiState } from './hooks/useSidebarUiState';
 import { useRuntimeMessages } from './hooks/useRuntimeMessages';
 import { useExtensionAuth } from './hooks/useExtensionAuth';
-import { authFetch } from '../lib/api';
+import { updateAnalysis } from '../lib/api';
 
 export default function App() {
   const { authState } = useExtensionAuth();
@@ -22,7 +22,7 @@ export default function App() {
 
   const {
     data, loading, restoredMessages, setRestoredMessages,
-    chatKey, setChatKey, pageLoadIdRef, applyPageData,
+    remoteId, setRemoteId, chatKey, setChatKey, pageLoadIdRef, applyPageData,
   } = usePageData();
 
   const {
@@ -59,9 +59,9 @@ export default function App() {
       setSelectedClaimText(text);
       closeSettings();
       setActiveTab('claim');
-      vouchSelectedClaim(text);
+      vouchSelectedClaim(text, data?.url, data?.title, remoteId);
     },
-    [closeSettings, resetClaim, setActiveTab, setSelectedClaimText, vouchSelectedClaim],
+    [closeSettings, data, remoteId, resetClaim, setActiveTab, setSelectedClaimText, vouchSelectedClaim],
   );
 
   const handleDataReady = useCallback(
@@ -85,7 +85,14 @@ export default function App() {
 
   // Save chat history on message changes
   const handleMessagesChange = (messages: ChatMessage[]) => {
-    if (data?.url) saveHistory(data.url, data.title, messages);
+    if (data?.url) {
+      saveHistory(data.url, data.title ?? '', messages);
+      if (remoteId) {
+        updateAnalysis(remoteId, {
+          chatHistory: messages.map(m => ({ sender: m.sender, text: m.text }))
+        }).catch(err => console.error('Failed to sync chat to dashboard:', err));
+      }
+    }
   };
 
   // Scan page: One click, one single request to the backend
@@ -93,9 +100,15 @@ export default function App() {
     if (!data?.textContent || !verifyEnabled) return;
     const loadId = ++pageLoadIdRef.current;
     setActiveTab('facts');
-    
+
     // The backend now handles both verification and bias in a single call
-    await startFullScan(data.textContent, data.url, loadId, pageLoadIdRef);
+    const result = await startFullScan(data.textContent, data.url, data.title, loadId, pageLoadIdRef);
+
+    // Save scan result to local sidebar history
+    if (result && data.url) {
+      saveScanToHistory(data.url, data.title, result.claims || [], result.analysis ?? null, result.remoteId);
+      if (result.remoteId) setRemoteId(result.remoteId);
+    }
   };
 
   // Toggle verification and close settings
@@ -106,8 +119,9 @@ export default function App() {
   };
 
   // History entry restore
-  const handleHistorySelect = (entry: { url: string; title: string; messages: ChatMessage[] }) => {
+  const handleHistorySelect = (entry: HistoryEntry) => {
     setRestoredMessages(entry.messages);
+    setRemoteId(entry.remoteId);
     setChatKey((k) => k + 1);
     setActiveTab(DEFAULT_TAB);
     closeSettings();

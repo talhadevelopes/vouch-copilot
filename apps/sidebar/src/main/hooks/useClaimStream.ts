@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import { authFetch } from '../../lib/api';
+import { authFetch, updateAnalysis } from '../../lib/api';
 import type { StreamEvent } from '../utils/types';
+import { saveVouchToHistory } from './useHistory';
 
 export function useClaimStream() {
   const [selectedClaimText, setSelectedClaimText] = useState('');
   const [selectedClaimStreamText, setSelectedClaimStreamText] = useState('');
   const [isVerifyingSelected, setIsVerifyingSelected] = useState(false);
 
-  const vouchSelectedClaim = async (text: string) => {
+  const vouchSelectedClaim = async (text: string, url?: string, title?: string, remoteId?: string) => {
+
     setIsVerifyingSelected(true);
     setSelectedClaimText(text);
     setSelectedClaimStreamText('');
@@ -59,6 +61,22 @@ export function useClaimStream() {
       setSelectedClaimStreamText('Verification failed. Please try again.');
     } finally {
       setIsVerifyingSelected(false);
+      // Save to local history after stream completes
+      if (url && selectedClaimStreamText) {
+        saveVouchToHistory(url, title || url, text, selectedClaimStreamText);
+        
+        // Sync to remote if we have a remoteId
+        if (remoteId) {
+          chrome.storage.local.get(`vouch_history_${url}`, (result) => {
+            const entry = result[`vouch_history_${url}`];
+            if (entry?.vouchEntries) {
+              updateAnalysis(remoteId, {
+                vouchHistory: entry.vouchEntries
+              }).catch(err => console.error('Failed to sync vouch to dashboard:', err));
+            }
+          });
+        }
+      }
     }
   };
 

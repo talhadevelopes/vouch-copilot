@@ -1,5 +1,5 @@
 import { createApiClient, createBrowserAuthStorage } from "@vouch/sdk";
-import type { AnalysisResult, VerificationResult } from "../sidebar/utils/types";
+import type { AnalysisResult, VerificationResult } from "../main/utils/types";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 const authStorage = createBrowserAuthStorage("vouch");
@@ -95,4 +95,11 @@ export async function authFetch(path: string, init: RequestInit = {}) {
   authStorage.setTokens({ accessToken: newAccess, refreshToken: newRefresh });
   response = await request(newAccess);
   return response;
+}
+
+export async function updateAnalysis(id: string, data: any) {
+  return authFetch(`/dashboard/analysis/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
 }

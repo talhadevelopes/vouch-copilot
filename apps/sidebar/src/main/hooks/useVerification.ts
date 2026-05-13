@@ -10,7 +10,13 @@ export function useVerification() {
   const [verifyEnabled, setVerifyEnabled] = useState(false);
   const verifyEnabledRef = useRef(false);
 
-  const startFullScan = async (content: string, url: string, loadId: number, pageLoadIdRef: React.MutableRefObject<number>) => {
+  const startFullScan = async (
+    content: string,
+    url: string,
+    title: string,
+    loadId: number,
+    pageLoadIdRef: React.MutableRefObject<number>,
+  ) => {
     setIsVerifying(true);
     setIsAnalyzing(true);
     setClaims([]);
@@ -18,28 +24,42 @@ export function useVerification() {
 
     try {
       const { data } = await scanFullPage(content, url);
-      
-      if (pageLoadIdRef.current !== loadId) return;
+
+      if (pageLoadIdRef.current !== loadId) return null;
 
       const { claims: scanClaims, analysis: scanAnalysis } = data;
-      
+
       setClaims(scanClaims || []);
       setAnalysis(scanAnalysis || null);
 
-      // Sync to dashboard with the pre-calculated results
-      authFetch('/dashboard/analysis', {
-        method: 'POST',
-        body: JSON.stringify({ 
-          inputUrl: url, 
-          content,
-          aiResponse: scanAnalysis?.overallTone,
-          proof: scanAnalysis?.manipulativeLanguage?.[0]?.reason,
-          biasScore: scanAnalysis?.biasScore
-        })
-      }).catch(err => console.error('Failed to sync extension scan to dashboard:', err));
+      // Sync to dashboard with the full rich data
+      let remoteId: string | undefined;
+      try {
+        const syncRes = await authFetch('/dashboard/analysis', {
+          method: 'POST',
+          body: JSON.stringify({
+            inputUrl: url,
+            pageTitle: title,
+            aiResponse: scanAnalysis?.overallTone,
+            proof: scanAnalysis?.manipulativeLanguage?.[0]?.reason,
+            biasScore: scanAnalysis?.biasScore,
+            claimsData: scanClaims,
+            biasData: scanAnalysis,
+          }),
+        });
+        
+        if (syncRes.ok) {
+          const syncData = await syncRes.json();
+          remoteId = syncData?.data?.item?.id;
+        }
+      } catch (err) {
+        console.error('Failed to sync extension scan to dashboard:', err);
+      }
 
+      return { claims: scanClaims, analysis: scanAnalysis, remoteId };
     } catch (error) {
       console.error('Full scan failed:', error);
+      return null;
     } finally {
       if (pageLoadIdRef.current === loadId) {
         setIsVerifying(false);
@@ -47,6 +67,7 @@ export function useVerification() {
       }
     }
   };
+
 
   const startVerification = async (content: string, url: string, loadId: number, pageLoadIdRef: React.MutableRefObject<number>) => {
     setIsVerifying(true);

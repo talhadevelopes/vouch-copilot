@@ -7,17 +7,24 @@ export function usePageData() {
   const [data, setData] = useState<PageData | null>(null);
   const [loading, setLoading] = useState(true);
   const [restoredMessages, setRestoredMessages] = useState<ChatMessage[]>([]);
+  const [remoteId, setRemoteId] = useState<string | undefined>(undefined);
   const [chatKey, setChatKey] = useState(0);
   const pageLoadIdRef = useRef(0);
 
   const loadPageData = async (tabId: number): Promise<PageData | null> => requestPageData(tabId);
 
-  const applyPageData = async (payload: PageData) => {
-    const history = await loadHistory(payload.url);
-    setRestoredMessages(history);
-    setData(payload);
-    setLoading(false);
-    // Don't reset chatKey here if it's the same URL to prevent UI reset
+  const applyPageData = async (payload: PageData): Promise<void> => {
+    return new Promise((resolve) => {
+      chrome.storage.local.get(`vouch_history_${payload.url}`, (result) => {
+        const entry = result[`vouch_history_${payload.url}`];
+        const history = entry?.messages ?? [];
+        setRestoredMessages(history);
+        setRemoteId(entry?.remoteId);
+        setData(payload);
+        setLoading(false);
+        resolve();
+      });
+    });
   };
 
   // Tab switch: re-fetch from session storage
@@ -37,7 +44,7 @@ export function usePageData() {
           pageLoadIdRef.current++;
           setRestoredMessages([]);
           setChatKey((k) => k + 1);
-          applyPageData(response);
+          applyPageData(response); // We might need to handle the return value here or elsewhere
           return response;
         });
       } else {
@@ -96,6 +103,8 @@ export function usePageData() {
     loading,
     restoredMessages,
     setRestoredMessages,
+    remoteId,
+    setRemoteId,
     chatKey,
     setChatKey,
     pageLoadIdRef,
