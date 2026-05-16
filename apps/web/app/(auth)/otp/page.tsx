@@ -126,7 +126,7 @@ export default function OTPVerifyPage() {
   if (!email) return null;
 
   return (
-    <div style={{ minHeight: "100vh", width: "100%", fontFamily: "'Cabinet Grotesk', sans-serif", background: "#ffffff", display: "flex", overflow: "hidden" }}>
+    <div className="auth-page" style={{ minHeight: "100vh", width: "100%", fontFamily: "'Cabinet Grotesk', sans-serif", background: "#ffffff", display: "flex", overflow: "hidden" }}>
       <style>{`
         @font-face {
           font-family: 'Cabinet Grotesk';
@@ -209,7 +209,7 @@ export default function OTPVerifyPage() {
       <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
 
         {/* Top bar */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 48px", borderBottom: "1px solid #ebebea" }}>
+        <div className="auth-topbar" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 48px", borderBottom: "1px solid #ebebea" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <Link href="/" style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}>
               <div style={{ width: "30px", height: "30px", borderRadius: "8px", background: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -229,7 +229,7 @@ export default function OTPVerifyPage() {
         <div style={{ flex: 1, display: "flex" }}>
 
           {/* Form area */}
-          <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 48px" }}>
+          <div className="auth-form-wrap" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 48px" }}>
             <div style={{ width: "100%", maxWidth: "400px" }}>
               <AnimatePresence mode="wait">
                 {verified ? (

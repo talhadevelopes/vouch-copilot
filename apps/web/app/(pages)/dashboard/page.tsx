@@ -162,7 +162,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", fontFamily: "'Cabinet Grotesk', sans-serif", background: "#ffffff" }}>
+    <div className="dashboard-page" style={{ minHeight: "100vh", fontFamily: "'Cabinet Grotesk', sans-serif", background: "#ffffff", overflowX: "hidden", maxWidth: "100%" }}>
       <style>{`
         @import url('https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,700,500,400&display=swap');
         @keyframes vd-spin  { to { transform: rotate(360deg) } }
@@ -216,32 +216,32 @@ export default function DashboardPage() {
       `}</style>
 
       {/* ════ NAV ════ */}
-      <nav style={{
+      <nav className="dashboard-nav" style={{
         position: "sticky", top: 0, zIndex: 100,
         background: "rgba(255,255,255,.94)", backdropFilter: "blur(12px)",
         borderBottom: "1px solid #f3f4f6", height: "58px", padding: "0 32px",
-        display: "flex", alignItems: "center", gap: "16px"
+        display: "flex", alignItems: "center", gap: "16px", flexWrap: "nowrap"
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "9px" }}>
+        <div className="dashboard-nav-brand" style={{ display: "flex", alignItems: "center", gap: "9px", flexShrink: 0 }}>
           <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "9px" }}>
             <div style={{ width: "33px", height: "33px", borderRadius: "9px", background: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <span style={{ color: "#fff", fontWeight: 900, fontSize: "14px", letterSpacing: "-0.05em" }}>V</span>
             </div>
-            <span style={{ fontWeight: 800, fontSize: "17px", letterSpacing: "-0.04em", color: "#111827" }}>Vouch</span>
+            <span className="dashboard-nav-title" style={{ fontWeight: 800, fontSize: "17px", letterSpacing: "-0.04em", color: "#111827" }}>Vouch</span>
           </Link>
-          <span style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#dc2626", fontSize: "9px", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", borderRadius: "100px", padding: "2px 8px" }}>Beta</span>
+          <span className="dashboard-nav-beta" style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#dc2626", fontSize: "9px", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", borderRadius: "100px", padding: "2px 8px" }}>Beta</span>
         </div>
 
-        <div style={{ width: "1px", height: "18px", background: "#f0f0f0" }} />
+        <div className="dashboard-nav-divider" style={{ width: "1px", height: "18px", background: "#f0f0f0", flexShrink: 0 }} />
 
-        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+        <div className="dashboard-nav-live" style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
           <span className="vd-pulse" style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />
-          <span style={{ color: "#9ca3af", fontSize: "11px", fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase" }}>Live</span>
+          <span className="dashboard-nav-live-text" style={{ color: "#9ca3af", fontSize: "11px", fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase" }}>Live</span>
         </div>
 
         <div style={{ flex: 1 }} />
 
-        <div style={{ display: "flex", gap: "26px", marginRight: "12px" }}>
+        <div className="dashboard-nav-stats" style={{ display: "flex", gap: "26px", marginRight: "12px" }}>
           {[["Week", `${totalRuns} runs`], ["Streak", "3 days"], ["Accuracy", "98%"]].map(([lbl, val]) => (
             <div key={lbl} style={{ textAlign: "center" }}>
               <div style={{ color: "#9ca3af", fontSize: "9.5px", fontWeight: 700, letterSpacing: "0.09em", textTransform: "uppercase" }}>{lbl}</div>
@@ -250,21 +250,22 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        <div style={{ width: "1px", height: "18px", background: "#f0f0f0" }} />
+        <div className="dashboard-nav-divider dashboard-nav-divider--user" style={{ width: "1px", height: "18px", background: "#f0f0f0", flexShrink: 0 }} />
 
-        <div style={{ display: "flex", alignItems: "center", gap: "9px" }}>
+        <div className="dashboard-nav-user" style={{ display: "flex", alignItems: "center", gap: "9px", flexShrink: 0, marginLeft: "auto" }}>
           <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <span style={{ color: "#fff", fontSize: "11px", fontWeight: 800 }}>{initials}</span>
           </div>
-          <span style={{ fontSize: "13px", fontWeight: 600, color: "#374151" }}>{user?.email}</span>
-          <button onClick={() => logoutMutation.mutate()} className="vd-nb" style={{ display: "flex", alignItems: "center", gap: "6px", background: "transparent", border: "1px solid #e5e7eb", borderRadius: "9px", padding: "7px 12px", color: "#6b7280", fontSize: "12.5px", fontWeight: 600 }}>
-            <LogOut size={13} /> Logout
+          <span className="dashboard-nav-email" style={{ fontSize: "13px", fontWeight: 600, color: "#374151" }}>{user?.email}</span>
+          <button onClick={() => logoutMutation.mutate()} className="vd-nb dashboard-nav-logout" style={{ display: "flex", alignItems: "center", gap: "6px", background: "transparent", border: "1px solid #e5e7eb", borderRadius: "9px", padding: "7px 12px", color: "#6b7280", fontSize: "12.5px", fontWeight: 600, whiteSpace: "nowrap", flexShrink: 0 }}>
+            <LogOut size={13} />
+            <span className="dashboard-nav-logout-text">Logout</span>
           </button>
         </div>
       </nav>
 
       {/* ════ CONTENT ════ */}
-      <div style={{ maxWidth: "1600px", margin: "0 auto", padding: "28px 28px 64px" }}>
+      <div className="dashboard-content" style={{ maxWidth: "1600px", margin: "0 auto", padding: "28px 28px 64px" }}>
 
         {/* Welcome — no card, just text */}
         <div className="vd-a1" style={{ marginBottom: "26px" }}>
@@ -281,7 +282,7 @@ export default function DashboardPage() {
         </div>
 
         {/* ════ BENTO GRID ════ */}
-        <div style={{
+        <div className="dashboard-bento" style={{
           display: "grid",
           gridTemplateColumns: "42% 1fr 1fr",
           gridTemplateRows: "auto auto",
@@ -290,7 +291,7 @@ export default function DashboardPage() {
         }}>
 
           {/* RED ANALYSIS PANEL — col1, rows 1+2 */}
-          <div className="vd-a2" style={{
+          <div className="vd-a2 dashboard-bento-red" style={{
             gridColumn: "1", gridRow: "1 / 3",
             background: "#dc2626", borderRadius: "20px",
             position: "relative", overflow: "hidden",
@@ -465,7 +466,7 @@ export default function DashboardPage() {
               <p style={{ color: "#d1d5db", fontWeight: 700, fontSize: "14px", margin: 0 }}>No analyses yet. Create your first one.</p>
             </div>
           ) : history.map((item, i) => (
-            <div key={item.id} className="vd-hr" style={{ display: "flex", alignItems: "center", gap: "16px", padding: "14px 26px", borderBottom: i < history.length - 1 ? "1px solid #f9f9f8" : "none" }}>
+            <div key={item.id} className="vd-hr dashboard-history-row" style={{ display: "flex", alignItems: "center", gap: "16px", padding: "14px 26px", borderBottom: i < history.length - 1 ? "1px solid #f9f9f8" : "none" }}>
               <div style={{ width: "28px", height: "28px", borderRadius: "8px", background: "#f9fafb", border: "1px solid #f0f0ef", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 <span style={{ color: "#9ca3af", fontSize: "10px", fontWeight: 800 }}>#{history.length - i}</span>
               </div>
@@ -476,7 +477,7 @@ export default function DashboardPage() {
                   <span style={{ color: "#9ca3af", fontSize: "11px", fontWeight: 500 }}>{new Date(item.createdAt).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                 </div>
               </div>
-              <div style={{ display: "flex", gap: "7px", flexShrink: 0 }}>
+              <div className="dashboard-history-actions" style={{ display: "flex", gap: "7px", flexShrink: 0 }}>
                 <Link href={`/dashboard/${item.id}`} style={{ textDecoration: "none" }}>
                   <button className="vd-gb" style={{ display: "flex", alignItems: "center", gap: "5px", background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: "9px", padding: "7px 13px", color: "#374151", fontSize: "12px", fontWeight: 700, cursor: "pointer" }}>
                     <ExternalLink size={11} /> View

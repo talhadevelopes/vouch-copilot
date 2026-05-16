@@ -89,9 +89,9 @@ export default function SetPasswordPage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen w-full flex bg-white overflow-hidden font-cabinet">
+    <div className="auth-page min-h-screen w-full flex bg-white overflow-hidden font-cabinet">
       {/* LEFT STRIP - Step Progress */}
-      <div className="w-20 bg-[#f7f6f3] border-r border-[#ebebea] flex flex-col items-center justify-center py-8 shrink-0">
+      <div className="auth-left-strip w-20 bg-[#f7f6f3] border-r border-[#ebebea] flex flex-col items-center justify-center py-8 shrink-0">
         {STEPS.map(({ n, label }, i) => {
           const idx = i + 1;
           const active = currentStep === idx;
@@ -118,7 +118,7 @@ export default function SetPasswordPage() {
       {/* MAIN AREA */}
       <div className="flex-1 flex flex-col">
         {/* Top bar */}
-        <div className="flex items-center justify-between px-12 py-4.5 border-b border-[#ebebea]">
+        <div className="auth-topbar flex items-center justify-between px-12 py-4.5 border-b border-[#ebebea]">
           <div className="flex items-center gap-2">
             <div className="w-7.5 h-7.5 rounded-lg bg-vouch-red flex items-center justify-center">
               <span className="text-white font-black text-xs tracking-tighter">V</span>
@@ -132,9 +132,9 @@ export default function SetPasswordPage() {
           </p>
         </div>
 
-        <div className="flex-1 flex">
+        <div className="auth-main-row flex-1 flex">
           {/* Form area */}
-          <div className="flex-1 flex items-center justify-center px-12 py-10">
+          <div className="auth-form-wrap flex-1 flex items-center justify-center px-12 py-10">
             <div className="w-full max-w-[400px]">
               <AnimatePresence mode="wait">
                 {done ? (

@@ -1,27 +1,29 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { 
-  Chrome, 
-  CheckCircle, 
-  MessageSquare, 
-  Shield, 
-  MousePointer, 
-  Eye, 
-  PenTool, 
-  Clock, 
-  Zap, 
+import {
+  Chrome,
+  CheckCircle,
+  MessageSquare,
+  Shield,
+  MousePointer,
+  Eye,
+  PenTool,
+  Clock,
+  Zap,
   Search,
   Settings,
   X,
-  ArrowRight
+  ArrowRight,
+  LogIn,
+  LogInIcon
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 
 const TICKER_ITEMS = [
-  "Fact Check", "Beat Bias", "Chat with Articles", 
-  "Verify Claims", "Detect Spin", "Read Smarter", 
+  "Fact Check", "Beat Bias", "Chat with Articles",
+  "Verify Claims", "Detect Spin", "Read Smarter",
   "Stay Informed", "No Guesswork"
 ];
 
@@ -84,12 +86,12 @@ export default function HomePage() {
   };
 
   return (
-    <div style={{ 
-      background: "#ffffff", 
-      color: "#111827", 
-      fontFamily: "'Cabinet Grotesk', sans-serif", 
-      overflowX: "hidden", 
-      WebkitFontSmoothing: "antialiased" 
+    <div className="landing-page" style={{
+      background: "#ffffff",
+      color: "#111827",
+      fontFamily: "'Cabinet Grotesk', sans-serif",
+      overflowX: "hidden",
+      WebkitFontSmoothing: "antialiased"
     }}>
       {/* Navigation */}
       <nav style={{
@@ -113,42 +115,41 @@ export default function HomePage() {
           <a href="#stack" style={{ fontWeight: 500, fontSize: "15px", color: "rgba(255,255,255,0.85)", transition: "color .15s ease" }}>Stack</a>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <Link href="/login" style={{ fontWeight: 700, fontSize: "15px", color: "#fff", marginRight: "8px" }}>Login</Link>
-          <a href="#" className="cta-primary" style={{
+          <a href="/login" className="cta-primary" style={{
             background: "#ffffff", color: "#dc2626", fontWeight: 800, borderRadius: "9px",
             padding: "10px 20px", display: "inline-flex", alignItems: "center", gap: "7px",
             transition: "all .2s ease", cursor: "pointer"
           }}>
-            <Chrome size={18} /> Add to Chrome
+            <LogInIcon size={18} /> Login
           </a>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section style={{ 
-        background: "#ffffff", 
-        padding: "0 48px", 
-        minHeight: "92vh", 
-        display: "flex", 
-        flexDirection: "column", 
-        justifyContent: "center", 
-        position: "relative", 
-        overflow: "hidden" 
+      <section className="landing-hero" style={{
+        background: "#ffffff",
+        padding: "0 48px",
+        minHeight: "92vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        position: "relative",
+        overflow: "hidden"
       }}>
-        <div style={{ 
-          position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", 
-          fontWeight: 800, fontSize: "min(22vw, 260px)", color: "rgba(0,0,0,0.02)", 
-          letterSpacing: "-0.05em", whiteSpace: "nowrap", pointerEvents: "none", 
-          userSelect: "none", lineHeight: 1, zIndex: 0 
+        <div style={{
+          position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)",
+          fontWeight: 800, fontSize: "min(22vw, 260px)", color: "rgba(0,0,0,0.02)",
+          letterSpacing: "-0.05em", whiteSpace: "nowrap", pointerEvents: "none",
+          userSelect: "none", lineHeight: 1, zIndex: 0
         }}>
           VOUCH
         </div>
         <div style={{ position: "absolute", top: "-8%", right: "-4%", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(220,38,38,0.08) 0%, transparent 65%)", pointerEvents: "none", zIndex: 0 }}></div>
         <div style={{ position: "absolute", bottom: "-10%", left: "5%", width: "380px", height: "380px", background: "radial-gradient(circle, rgba(220,38,38,0.06) 0%, transparent 65%)", pointerEvents: "none", zIndex: 0 }}></div>
 
-        <div style={{ maxWidth: "1200px", margin: "0 auto", width: "100%", position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "space-between", gap: "40px" }} className="flex-col lg:flex-row">
+        <div className="landing-hero-inner flex-col lg:flex-row" style={{ maxWidth: "1200px", margin: "0 auto", width: "100%", position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "space-between", gap: "40px" }}>
           <div style={{ flex: 1, maxWidth: "500px" }}>
-            <motion.h1 
+            <motion.h1
               initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.65, delay: 0.1 }}
@@ -158,7 +159,7 @@ export default function HomePage() {
               <span style={{ color: "#dc2626" }}>like a journalist.</span>
             </motion.h1>
 
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.65, delay: 0.2 }}
@@ -168,19 +169,19 @@ export default function HomePage() {
               any question about what you're reading. In real time.
             </motion.p>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.65, delay: 0.3 }}
               style={{ display: "flex", gap: "14px", flexWrap: "wrap", alignItems: "center", marginBottom: "48px" }}
             >
-              <a href="#" style={{ 
+              <a href="#" style={{
                 background: "#dc2626", color: "#fff", borderRadius: "11px", padding: "16px 32px", fontSize: "16px",
                 fontWeight: 800, display: "inline-flex", alignItems: "center", gap: "7px", transition: "all .2s ease"
               }} className="cta-primary-lg">
                 <Chrome size={20} /> Add to Chrome — Free
               </a>
-              <a href="#features" style={{ 
+              <a href="#features" style={{
                 background: "transparent", color: "#4b5563", fontWeight: 500, border: "1px solid #d1d5db",
                 borderRadius: "11px", padding: "16px 28px", display: "inline-block", transition: "all .2s"
               }} className="cta-secondary">
@@ -188,41 +189,41 @@ export default function HomePage() {
               </a>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.65, delay: 0.4 }}
-              style={{ display: "flex", gap: 0, borderTop: "1px solid #e5e7eb", flexWrap: "wrap" }}
+              className="landing-hero-stats flex w-full flex-row items-start justify-between gap-3 border-t border-[#e5e7eb] pt-5 sm:gap-6 lg:gap-0 lg:pt-6"
             >
-              <div style={{ padding: "24px 44px 0 0", borderRight: "1px solid #e5e7eb", marginRight: "44px" }}>
-                <div style={{ fontWeight: 800, fontSize: "32px", letterSpacing: "-0.03em", color: "#dc2626" }}>7+</div>
-                <div style={{ fontWeight: 500, fontSize: "13px", color: "#6b7280", marginTop: "2px" }}>Features</div>
+              <div className="landing-stat-item min-w-0 flex-1 text-center lg:flex-none lg:border-r lg:border-[#e5e7eb] lg:pr-11 lg:mr-11 lg:pt-6 lg:text-left">
+                <div className="text-lg font-extrabold leading-none text-[#dc2626] sm:text-xl lg:text-[32px]">7+</div>
+                <div className="mt-1 text-[10px] font-medium text-[#6b7280] sm:text-[11px] lg:text-[13px]">Features</div>
               </div>
-              <div style={{ padding: "24px 44px 0 0", borderRight: "1px solid #e5e7eb", marginRight: "44px" }}>
-                <div style={{ fontWeight: 800, fontSize: "32px", letterSpacing: "-0.03em", color: "#dc2626" }}>Real-time</div>
-                <div style={{ fontWeight: 500, fontSize: "13px", color: "#6b7280", marginTop: "2px" }}>Fact-checking</div>
+              <div className="landing-stat-item min-w-0 flex-1 text-center lg:flex-none lg:border-r lg:border-[#e5e7eb] lg:pr-11 lg:mr-11 lg:pt-6 lg:text-left">
+                <div className="text-lg font-extrabold leading-none text-[#dc2626] sm:text-xl lg:text-[32px]">Real-time</div>
+                <div className="mt-1 text-[10px] font-medium text-[#6b7280] sm:text-[11px] lg:text-[13px]">Fact-checking</div>
               </div>
-              <div style={{ padding: "24px 0 0 0" }}>
-                <div style={{ fontWeight: 800, fontSize: "32px", letterSpacing: "-0.03em", color: "#dc2626" }}>72h</div>
-                <div style={{ fontWeight: 500, fontSize: "13px", color: "#6b7280", marginTop: "2px" }}>Chat history</div>
+              <div className="landing-stat-item min-w-0 flex-1 text-center lg:flex-none lg:pt-6 lg:text-left">
+                <div className="text-lg font-extrabold leading-none text-[#dc2626] sm:text-xl lg:text-[32px]">72h</div>
+                <div className="mt-1 text-[10px] font-medium text-[#6b7280] sm:text-[11px] lg:text-[13px]">Chat history</div>
               </div>
             </motion.div>
           </div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65, delay: 0.5 }}
             style={{ flex: 1, display: "flex", justifyContent: "flex-end", position: "relative" }}
           >
             {/* Extension Mockup */}
-            <div style={{ 
-              width: "400px", background: "#ffffff", borderRadius: "16px", 
-              boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)", border: "1px solid #e5e7eb", 
+            <div className="landing-mockup" style={{
+              width: "400px", background: "#ffffff", borderRadius: "16px",
+              boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)", border: "1px solid #e5e7eb",
               overflow: "hidden", display: "flex", flexDirection: "column", height: "580px",
               transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
             }}>
-              <div style={{ background: "#dc2626", padding: "12px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", color: "white", borderBottom: "2px solid #b91c1c" }}>
+                            <div style={{ background: "#dc2626", padding: "12px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", color: "white", borderBottom: "2px solid #b91c1c" }}>
                 <div style={{ display: "flex", alignItems: "center" }}>
                   <img src="/logo.png" alt="Vouch" style={{ height: "20px", display: "block", filter: "brightness(0) invert(1)" }} />
                 </div>
@@ -247,10 +248,10 @@ export default function HomePage() {
                 </div>
 
                 <div style={{ padding: "20px", display: "flex", flexDirection: "column" }}>
-                  <div style={{ 
-                    display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", 
+                  <div style={{
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
                     padding: "10px 14px", borderRadius: "8px", fontSize: "13px", fontWeight: 700,
-                    width: "fit-content", marginBottom: "16px", background: "#f0fdf4", color: "#16a34a", 
+                    width: "fit-content", marginBottom: "16px", background: "#f0fdf4", color: "#16a34a",
                     border: "1px solid #bbf7d0", boxShadow: "0 1px 2px rgba(22,163,74,0.05)"
                   }}>
                     <CheckCircle size={14} /> Verified
@@ -288,7 +289,7 @@ export default function HomePage() {
       </div>
 
       {/* Screenshots Section */}
-      <section id="screenshots" style={{ background: "#f9fafb", padding: "100px 48px" }}>
+      <section id="screenshots" className="landing-section" style={{ background: "#f9fafb", padding: "100px 48px" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto", width: "100%", position: "relative", zIndex: 2 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "20px", marginBottom: "56px" }}>
             <motion.div {...fadeIn}>
@@ -301,12 +302,12 @@ export default function HomePage() {
             </motion.div>
           </div>
 
-          <div 
+          <div
             onClick={nextImage}
-            style={{ 
-              position: "relative", borderRadius: "16px", overflow: "hidden", border: "1px solid #e5e7eb", 
-              background: "#fafafa", marginBottom: "16px", cursor: "pointer", 
-              opacity: isFading ? 0 : 1, transition: "opacity 0.2s ease" 
+            style={{
+              position: "relative", borderRadius: "16px", overflow: "hidden", border: "1px solid #e5e7eb",
+              background: "#fafafa", marginBottom: "16px", cursor: "pointer",
+              opacity: isFading ? 0 : 1, transition: "opacity 0.2s ease"
             }}
           >
             <div style={{ position: "absolute", top: "18px", left: "18px", zIndex: 10, background: "rgba(255,255,255,0.9)", backdropFilter: "blur(10px)", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "6px 14px", fontWeight: 700, fontSize: "12px", color: "#dc2626", letterSpacing: "0.06em", textTransform: "uppercase" }}>
@@ -315,10 +316,10 @@ export default function HomePage() {
             <div style={{ position: "absolute", top: "18px", right: "18px", zIndex: 10, background: "rgba(255,255,255,0.9)", backdropFilter: "blur(10px)", border: "1px solid #e5e7eb", borderRadius: "8px", padding: "6px 14px", fontWeight: 700, fontSize: "12px", color: "#4b5563" }}>
               {activeIdx + 1} / {IMAGES.length}
             </div>
-            <img 
-              src={IMAGES[activeIdx].src} 
+            <img
+              src={IMAGES[activeIdx].src}
               alt={IMAGES[activeIdx].label}
-              style={{ width: "100%", aspectRatio: "16/9", objectFit: "contain", background: "#fafafa", display: "block" }} 
+              style={{ width: "100%", aspectRatio: "16/9", objectFit: "contain", background: "#fafafa", display: "block" }}
             />
             <div onClick={(e) => { e.stopPropagation(); prevImage(); }} style={{ position: "absolute", top: 0, bottom: 0, width: "15%", zIndex: 9, left: 0 }}></div>
             <div onClick={(e) => { e.stopPropagation(); nextImage(); }} style={{ position: "absolute", top: 0, bottom: 0, width: "15%", zIndex: 9, right: 0 }}></div>
@@ -326,13 +327,13 @@ export default function HomePage() {
 
           <div style={{ display: "flex", gap: "10px", overflowX: "auto", paddingBottom: "6px", scrollbarWidth: "none" }}>
             {IMAGES.map((img, i) => (
-              <div 
-                key={i} 
+              <div
+                key={i}
                 onClick={() => updateGallery(i)}
-                style={{ 
-                  flexShrink: 0, width: "140px", borderRadius: "10px", overflow: "hidden", 
-                  border: i === activeIdx ? "2px solid #dc2626" : "2px solid #e5e7eb", 
-                  opacity: i === activeIdx ? 1 : 0.5, transition: "all .22s ease", cursor: "pointer", background: "#fafafa" 
+                style={{
+                  flexShrink: 0, width: "140px", borderRadius: "10px", overflow: "hidden",
+                  border: i === activeIdx ? "2px solid #dc2626" : "2px solid #e5e7eb",
+                  opacity: i === activeIdx ? 1 : 0.5, transition: "all .22s ease", cursor: "pointer", background: "#fafafa"
                 }}
               >
                 <img src={img.src} alt={img.label} style={{ width: "100%", aspectRatio: "16/9", objectFit: "contain", display: "block" }} />
@@ -343,12 +344,12 @@ export default function HomePage() {
 
           <div style={{ display: "flex", justifyContent: "center", gap: "6px", marginTop: "24px" }}>
             {IMAGES.map((_, i) => (
-              <div 
+              <div
                 key={i}
                 onClick={() => updateGallery(i)}
-                style={{ 
-                  height: "5px", width: i === activeIdx ? "28px" : "5px", borderRadius: "3px", 
-                  background: i === activeIdx ? "#dc2626" : "#d1d5db", cursor: "pointer", transition: "all .3s ease" 
+                style={{
+                  height: "5px", width: i === activeIdx ? "28px" : "5px", borderRadius: "3px",
+                  background: i === activeIdx ? "#dc2626" : "#d1d5db", cursor: "pointer", transition: "all .3s ease"
                 }}
               ></div>
             ))}
@@ -357,8 +358,8 @@ export default function HomePage() {
       </section>
 
       {/* Problem Section */}
-      <section style={{ background: "#dc2626", padding: "80px 48px", color: "#fff" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto", width: "100%", position: "relative", zIndex: 2, display: "grid", gridTemplateColumns: "1fr 1fr", gap: "80px", alignItems: "center" }} className="flex-col md:grid">
+      <section className="landing-section landing-problem" style={{ background: "#dc2626", padding: "80px 48px", color: "#fff" }}>
+        <div className="landing-problem-grid" style={{ maxWidth: "1200px", margin: "0 auto", width: "100%", position: "relative", zIndex: 2, display: "grid", gridTemplateColumns: "1fr 1fr", gap: "80px", alignItems: "center" }}>
           <motion.div {...fadeIn}>
             <h2 style={{ fontWeight: 800, fontSize: "clamp(28px, 4vw, 50px)", letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "20px", color: "#fff" }}>Reading the news is broken.</h2>
             <p style={{ fontWeight: 500, fontSize: "17px", color: "rgba(255,255,255,0.85)", lineHeight: 1.75 }}>Claims go unchecked. Bias hides in plain sight. Long articles bury the point. You shouldn't need a research team just to read with confidence.</p>
@@ -380,7 +381,7 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" style={{ background: "#ffffff", padding: "100px 48px", borderBottom: "1px solid #f3f4f6" }}>
+      <section id="features" className="landing-section" style={{ background: "#ffffff", padding: "100px 48px", borderBottom: "1px solid #f3f4f6" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto", width: "100%", position: "relative", zIndex: 2 }}>
           <div style={{ marginBottom: "56px" }}>
             <div style={{ fontWeight: 700, fontSize: "11px", letterSpacing: "0.12em", textTransform: "uppercase", color: "#dc2626", marginBottom: "12px" }}>Features</div>
@@ -388,7 +389,7 @@ export default function HomePage() {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(255px, 1fr))", gap: "16px" }}>
             {FEATURES.map((f, i) => (
-              <motion.div 
+              <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 28 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -409,14 +410,14 @@ export default function HomePage() {
       </section>
 
       {/* Stack Section */}
-      <section id="stack" style={{ background: "#f9fafb", padding: "100px 48px", borderBottom: "1px solid #e5e7eb" }}>
+      <section id="stack" className="landing-section" style={{ background: "#f9fafb", padding: "100px 48px", borderBottom: "1px solid #e5e7eb" }}>
         <div style={{ maxWidth: "1000px", margin: "0 auto", width: "100%", position: "relative", zIndex: 2 }}>
           <div style={{ textAlign: "center", marginBottom: "56px" }}>
             <div style={{ fontWeight: 700, fontSize: "11px", letterSpacing: "0.12em", textTransform: "uppercase", color: "#dc2626", marginBottom: "12px" }}>Tech Stack</div>
             <h2 style={{ fontWeight: 800, fontSize: "clamp(28px, 4vw, 52px)", letterSpacing: "-0.03em", color: "#111827", lineHeight: 1.1 }}>Built on what works.</h2>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }} className="flex-col md:grid">
-            <motion.div 
+          <motion.div className="landing-stack-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+            <motion.div
               initial={{ opacity: 0, y: 28 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -434,7 +435,7 @@ export default function HomePage() {
                 <span style={{ fontWeight: 600, fontSize: "13.5px", background: "#f3f4f6", color: "#374151", padding: "7px 14px", borderRadius: "100px", border: "1px solid #e5e7eb" }}>Mozilla Readability</span>
               </div>
             </motion.div>
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 28 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -452,12 +453,12 @@ export default function HomePage() {
                 <span style={{ fontWeight: 600, fontSize: "13.5px", background: "#f3f4f6", color: "#374151", padding: "7px 14px", borderRadius: "100px", border: "1px solid #e5e7eb" }}>Upstash Redis</span>
               </div>
             </motion.div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section style={{ background: "#ffffff", padding: "120px 48px", textAlign: "center", position: "relative", overflow: "hidden" }}>
+      <section className="landing-section landing-cta" style={{ background: "#ffffff", padding: "120px 48px", textAlign: "center", position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "700px", height: "700px", background: "radial-gradient(circle, rgba(220,38,38,0.06) 0%, transparent 65%)", pointerEvents: "none" }}></div>
         <div style={{ maxWidth: "680px", margin: "0 auto", width: "100%", position: "relative", zIndex: 2 }}>
           <motion.div {...fadeIn}>
@@ -466,14 +467,14 @@ export default function HomePage() {
             <p style={{ fontWeight: 500, fontSize: "18px", color: "#4b5563", lineHeight: 1.75, marginBottom: "44px" }}>Free to install. One click and your browser becomes the most powerful reading tool you've ever used.</p>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 28 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.65, delay: 0.3 }}
             style={{ marginTop: "28px" }}
           >
-            <a href="#" style={{ 
+            <a href="#" style={{
               background: "#dc2626", color: "#fff", padding: "18px 40px", borderRadius: "12px",
               fontWeight: 800, display: "inline-flex", alignItems: "center", gap: "7px", transition: "all .2s ease"
             }} className="cta-primary-xl">
@@ -481,7 +482,7 @@ export default function HomePage() {
             </a>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 28 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -496,7 +497,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer style={{ background: "#f9fafb", borderTop: "1px solid #e5e7eb", padding: "28px 48px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+      <footer className="landing-footer" style={{ background: "#f9fafb", borderTop: "1px solid #e5e7eb", padding: "28px 48px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <img src="/logo.png" alt="Vouch" style={{ height: "26px", width: "auto", display: "block", objectFit: "contain" }} />
         </div>

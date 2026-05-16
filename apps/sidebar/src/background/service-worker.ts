@@ -84,6 +84,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
+
+
+  //highlight text
   if (message.type === 'HIGHLIGHT_REQUEST') {
     chrome.tabs.sendMessage(message.tabId, {
       type: 'HIGHLIGHT_TEXT',
@@ -92,6 +95,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
+//Vouch this Claim
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "vouch-this" && info.selectionText && tab?.id) {
     chrome.sidePanel.open({ tabId: tab.id });

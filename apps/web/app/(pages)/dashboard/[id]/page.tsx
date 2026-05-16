@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { 
@@ -140,12 +141,12 @@ const BentoCard = ({ children, title, icon: Icon, color = "gray", className = ""
   };
 
   return (
-    <div className={`rounded-3xl border p-5 flex flex-col shadow-sm hover:shadow-md transition-all ${themes[color]} ${className}`}>
+    <div className={`rounded-3xl border p-5 lg:p-7 flex flex-col shadow-sm hover:shadow-md transition-all ${themes[color]} ${className}`}>
       <div className="flex items-center gap-2.5 mb-4">
         <div className={`p-1.5 rounded-lg ${iconColors[color]}`}>
           <Icon size={14} strokeWidth={2.5} />
         </div>
-        <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500">{title}</h3>
+        <h3 className="text-[9px] lg:text-[11px] font-black uppercase tracking-[0.2em] text-gray-500">{title}</h3>
       </div>
       <div className="flex-1">
         {children}
@@ -154,9 +155,64 @@ const BentoCard = ({ children, title, icon: Icon, color = "gray", className = ""
   );
 };
 
+function AuditChatPanel({ messages }: { messages: ChatMessage[] }) {
+  if (!messages?.length) {
+    return (
+      <div className="py-12 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-red-200 bg-gradient-to-b from-red-50/50 to-white">
+        <MessageCircle size={28} className="mb-3 text-red-300" />
+        <p className="text-[10px] lg:text-xs font-black uppercase tracking-widest text-red-400">No chat history yet</p>
+      </div>
+    );
+  }
+
+  return (
+    <motion.div className="rounded-2xl overflow-hidden border border-red-200/70 shadow-lg shadow-red-100/50 bg-gradient-to-b from-red-50/60 via-white to-white">
+      <motion.div className="bg-gradient-to-r from-[#dc2626] to-[#b91c1c] px-4 py-3.5 lg:px-5 lg:py-4 flex items-center gap-3">
+        <motion.div className="w-9 h-9 lg:w-10 lg:h-10 rounded-xl bg-white/20 flex items-center justify-center ring-2 ring-white/30">
+          <Sparkles size={18} className="text-white" />
+        </motion.div>
+        <motion.div>
+          <p className="text-white font-black text-sm lg:text-base">Vouch Assistant</p>
+          <p className="text-white/75 text-[10px] lg:text-[11px] font-bold uppercase tracking-wider">Powered by your audit session</p>
+        </motion.div>
+      </motion.div>
+      <motion.div className="p-4 lg:p-5 space-y-4 max-h-[480px] lg:max-h-[560px] overflow-y-auto">
+        {messages.map((msg, i) => (
+          <motion.div key={i} className={`flex gap-3 ${msg.sender === "user" ? "flex-row-reverse" : "flex-row"}`}>
+            <motion.div
+              className={`w-8 h-8 lg:w-9 lg:h-9 rounded-full flex items-center justify-center shrink-0 ${
+                msg.sender === "user" ? "bg-[#dc2626] text-white" : "bg-red-100 text-[#dc2626] border border-red-200"
+              }`}
+            >
+              {msg.sender === "user" ? <MousePointer2 size={14} /> : <Sparkles size={14} />}
+            </motion.div>
+            <motion.div className={`flex flex-col max-w-[88%] ${msg.sender === "user" ? "items-end" : "items-start"}`}>
+              <span className={`text-[9px] lg:text-[10px] font-black uppercase tracking-widest mb-1 ${msg.sender === "user" ? "text-white/70" : "text-gray-400"}`}>
+                {msg.sender === "user" ? "You" : "Vouch AI"}
+              </span>
+              <motion.div
+                className={`px-4 py-3 rounded-2xl text-[12px] lg:text-[14px] font-semibold leading-relaxed ${
+                  msg.sender === "user"
+                    ? "bg-gradient-to-br from-[#dc2626] to-[#b91c1c] text-white rounded-tr-md shadow-md shadow-red-300/40 [&_*]:!text-white [&_strong]:!text-white [&_em]:!text-white/90"
+                    : "bg-white text-gray-800 rounded-tl-md border border-red-100 shadow-sm ring-1 ring-red-50/80"
+                }`}
+              >
+                {renderMarkdown(msg.text)}
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        ))}
+      </motion.div>
+    </motion.div>
+  );
+}
+
+type MobileTab = "analysis" | "chat" | "bias";
+
 export default function DashboardDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
+  const [mobileTab, setMobileTab] = useState<MobileTab>("analysis");
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["analysis", params.id],
@@ -224,7 +280,7 @@ export default function DashboardDetailPage() {
         </Link>
       </nav>
 
-      <main className="w-full max-w-[1400px] mx-auto p-6 md:p-8">
+      <main className="w-full max-w-[1400px] lg:max-w-[1520px] mx-auto p-6 md:p-8 lg:p-10">
         
         {/* --- Hero --- */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
@@ -232,7 +288,7 @@ export default function DashboardDetailPage() {
             <div className="flex items-center gap-2 text-[#dc2626] font-black text-[9px] uppercase tracking-[0.4em] mb-3 bg-red-50 w-fit px-2 py-0.5 rounded-lg border border-red-100">
               <Fingerprint size={10} /> Neural Session: {item.id.slice(0, 12).toUpperCase()}
             </div>
-            <h1 className="text-2xl md:text-3xl font-black tracking-tight leading-[1.1] text-gray-900 mb-4 italic uppercase">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-black tracking-tight leading-[1.1] text-gray-900 mb-4 italic uppercase">
               {item.pageTitle || "Unidentified Stream"}
             </h1>
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
@@ -266,11 +322,31 @@ export default function DashboardDetailPage() {
           </div>
         </div>
 
+        {/* Mobile tabs */}
+        <div className="lg:hidden flex gap-2 mb-5 p-1.5 bg-gray-100 rounded-2xl">
+          {([
+            { id: "analysis" as const, label: "Analysis" },
+            { id: "chat" as const, label: "AI Chat" },
+            { id: "bias" as const, label: "Bias" },
+          ]).map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setMobileTab(tab.id)}
+              className={`flex-1 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-wide transition-all ${
+                mobileTab === tab.id ? "bg-[#dc2626] text-white shadow-md shadow-red-200" : "text-gray-500"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
         {/* --- Bento Grid --- */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
           
           {/* Left Column (8/12) */}
-          <div className="lg:col-span-8 space-y-6">
+          <div className={`lg:col-span-8 space-y-6 ${mobileTab !== "analysis" ? "hidden lg:block" : ""}`}>
             
             <BentoCard title="Executive Verdict" icon={ShieldCheck} color="red">
               <div className="bg-white rounded-2xl p-5 border border-red-50 shadow-sm relative overflow-hidden group">
@@ -288,10 +364,10 @@ export default function DashboardDetailPage() {
                     <div key={i} className="bg-white border border-gray-100 rounded-2xl p-4 hover:border-blue-200 transition-all flex flex-col justify-between">
                       <div className="mb-3">
                         <div className="flex items-start justify-between gap-3 mb-2">
-                          <h4 className="text-[12px] font-black leading-tight text-gray-900 italic">"{claim.claim}"</h4>
+                          <h4 className="text-[12px] lg:text-sm font-black leading-tight text-gray-900 italic">"{claim.claim}"</h4>
                           <VerdictBadge verdict={claim.verdict} />
                         </div>
-                        <p className="text-[10px] text-gray-500 font-medium leading-relaxed">{claim.explanation}</p>
+                        <p className="text-[10px] lg:text-xs text-gray-500 font-medium leading-relaxed">{claim.explanation}</p>
                       </div>
                       {claim.sources.length > 0 && (
                         <div className="flex flex-wrap gap-1.5 pt-3 border-t border-gray-50">
@@ -342,32 +418,11 @@ export default function DashboardDetailPage() {
           {/* Right Column (4/12) */}
           <div className="lg:col-span-4 space-y-6">
             
-            <BentoCard title="Audit Dialogue" icon={MessageCircle} color="purple">
-              {item.chatHistory && item.chatHistory.length > 0 ? (
-                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 scrollbar-hide">
-                  {item.chatHistory.map((msg, i) => (
-                    <div key={i} className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
-                      <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1 px-2">
-                        {msg.sender === 'user' ? 'YOU' : 'VOUCH_AI'}
-                      </span>
-                      <div className={`max-w-[90%] px-3 py-2 rounded-2xl text-[11px] font-bold leading-relaxed shadow-sm ${
-                        msg.sender === 'user' 
-                          ? 'bg-[#dc2626] text-white rounded-tr-none' 
-                          : 'bg-white text-gray-700 rounded-tl-none border border-gray-100'
-                      }`}>
-                        {renderMarkdown(msg.text)}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="py-10 flex flex-col items-center justify-center text-gray-300 border border-dashed border-gray-200 rounded-2xl">
-                  <MessageCircle size={24} className="mb-2 opacity-20" />
-                  <p className="text-[9px] font-black uppercase tracking-widest">No chat history</p>
-                </div>
-              )}
-            </BentoCard>
+            <div className={mobileTab !== "chat" ? "hidden lg:block" : ""}>
+                <AuditChatPanel messages={item.chatHistory ?? []} />
+            </div>
 
+            <div className={mobileTab !== "bias" ? "hidden lg:block" : ""}>
             <BentoCard title="Linguistic Patterns" icon={AlertTriangle} color="orange">
               <div className="space-y-4">
                 <div>
@@ -419,6 +474,7 @@ export default function DashboardDetailPage() {
                 ))}
               </div>
             </BentoCard>
+            </div>
 
           </div>
         </div>

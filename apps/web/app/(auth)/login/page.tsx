@@ -105,7 +105,7 @@ export default function VouchLogin() {
                 (demoLoginMutation.error as Error | null)?.message;
 
   return (
-    <div style={{ minHeight:"100vh", width:"100%", display:"flex", fontFamily:"'Cabinet Grotesk', sans-serif", background:"#ffffff", overflow:"hidden" }}>
+    <div className="login-page" style={{ minHeight:"100vh", width:"100%", display:"flex", fontFamily:"'Cabinet Grotesk', sans-serif", background:"#ffffff", overflow:"hidden" }}>
 
       <style>{`
         @import url('https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,700,500,400&display=swap');
@@ -156,7 +156,7 @@ export default function VouchLogin() {
       `}</style>
 
       {/* ═══ LEFT — RED BRAND PANEL ═══ */}
-      <div style={{
+      <div className="login-brand-panel" style={{
         width:"50%", display:"flex", flexDirection:"column",
         background:"#dc2626", position:"relative", overflow:"hidden"
       }}>
@@ -298,7 +298,7 @@ export default function VouchLogin() {
       </div>
 
       {/* ═══ RIGHT — FORM PANEL ═══ */}
-      <div style={{
+      <div className="login-form-panel" style={{
         flex:1, display:"flex", alignItems:"center", justifyContent:"center",
         padding:"40px 32px", background:"#ffffff", position:"relative"
       }}>

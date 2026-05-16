@@ -38,6 +38,16 @@
 body {
   @apply bg-white text-gray-900 font-sans;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+.dashboard-page {
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 /* Base styles for the "Vouch" feel */
@@ -70,4 +80,233 @@ body {
 
 .animate-ticker:hover {
   animation-play-state: paused;
+}
+
+/* Mobile layout overrides — desktop (1024px+) keeps inline styles */
+@media (max-width: 1023px) {
+  .auth-left-strip {
+    display: none !important;
+  }
+
+  .login-page {
+    flex-direction: column !important;
+  }
+
+  .login-brand-panel {
+    display: none !important;
+  }
+
+  .login-form-panel {
+    width: 100% !important;
+    flex: 1 !important;
+    padding: 24px 16px !important;
+  }
+
+  .auth-topbar {
+    padding: 14px 16px !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+  }
+
+  .auth-form-wrap {
+    padding: 24px 16px !important;
+  }
+
+  .auth-main-row {
+    flex-direction: column !important;
+  }
+
+  /* Landing */
+  .landing-page nav {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    height: 3.5rem !important;
+  }
+
+  .landing-page nav img {
+    height: 2rem !important;
+  }
+
+  .landing-page nav > div:last-child {
+    gap: 8px !important;
+  }
+
+  .landing-page nav a.cta-primary {
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+  }
+
+
+  .landing-page .landing-hero {
+    padding: 2.5rem 1rem !important;
+    min-height: auto !important;
+  }
+
+  .landing-page .landing-hero-inner {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 2rem !important;
+  }
+
+  .landing-page .landing-mockup {
+    width: 100% !important;
+    max-width: 340px !important;
+    height: auto !important;
+    min-height: 420px !important;
+  }
+
+  .landing-page .landing-hero-inner > div:last-child {
+    justify-content: center !important;
+    width: 100% !important;
+  }
+
+  .auth-page .auth-topbar p {
+    font-size: 12px !important;
+  }
+
+  .auth-page .auth-main-row {
+    flex-direction: column !important;
+  }
+
+  .landing-page .landing-hero-stats {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 0.5rem !important;
+  }
+
+  .landing-page .landing-stat-item {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    text-align: center !important;
+  }
+
+  .landing-page .landing-section {
+    padding: 3rem 1rem !important;
+  }
+
+  .landing-page .landing-cta {
+    padding: 3.5rem 1rem !important;
+  }
+
+  .landing-page .landing-problem {
+    padding: 3rem 1rem !important;
+  }
+
+  .landing-problem-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2rem !important;
+  }
+
+  .landing-stack-grid {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .landing-page .landing-footer {
+    padding: 1.25rem 1rem !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  /* Dashboard */
+  .dashboard-page nav {
+    padding: 0 12px !important;
+    height: 58px !important;
+    min-height: 58px !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    overflow: hidden !important;
+    max-width: 100vw !important;
+  }
+
+  .dashboard-page .dashboard-nav-beta {
+    display: none !important;
+  }
+
+  .dashboard-page .dashboard-nav-divider,
+  .dashboard-page .dashboard-nav-live-text {
+    display: none !important;
+  }
+
+  .dashboard-page .dashboard-nav-user {
+    flex-shrink: 0 !important;
+    margin-left: auto !important;
+    gap: 6px !important;
+  }
+
+  .dashboard-page .dashboard-nav-logout-text {
+    display: none !important;
+  }
+
+  .dashboard-page .dashboard-nav-logout {
+    padding: 8px !important;
+    min-width: 36px !important;
+    justify-content: center !important;
+  }
+
+  .dashboard-page .dashboard-nav-user button {
+    padding: 8px !important;
+    font-size: 11px !important;
+  }
+
+  .dashboard-page .dashboard-bento-red {
+    overflow: hidden !important;
+  }
+
+  .dashboard-page .vd-ticker {
+    max-width: 100% !important;
+  }
+
+  .dashboard-page .dashboard-nav-stats {
+    display: none !important;
+  }
+
+  .dashboard-page .dashboard-nav-email {
+    display: none !important;
+  }
+
+  .dashboard-page .dashboard-content {
+    padding: 16px 12px 48px !important;
+  }
+
+  .dashboard-page .dashboard-bento {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: none !important;
+  }
+
+  .dashboard-page .dashboard-bento-red {
+    min-height: auto !important;
+    grid-row: auto !important;
+    grid-column: auto !important;
+  }
+
+  .dashboard-page .dashboard-bento > * {
+    grid-column: auto !important;
+    grid-row: auto !important;
+  }
+
+  .dashboard-page .dashboard-history-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .dashboard-page .dashboard-history-actions {
+    width: 100% !important;
+    justify-content: stretch !important;
+  }
+
+  .dashboard-page .dashboard-history-actions button,
+  .dashboard-page .dashboard-history-actions a {
+    flex: 1 !important;
+    justify-content: center !important;
+  }
 }

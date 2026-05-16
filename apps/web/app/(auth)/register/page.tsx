@@ -61,9 +61,9 @@ export default function RegisterPage() {
   const error = (otpRequestMutation.error as Error | null)?.message;
 
   return (
-    <div style={{ minHeight: '100vh', width: '100%', display: 'flex', backgroundColor: '#ffffff', overflow: 'hidden', fontFamily: '"Cabinet Grotesk", sans-serif' }}>
+    <div className="auth-page" style={{ minHeight: '100vh', width: '100%', display: 'flex', backgroundColor: '#ffffff', overflow: 'hidden', fontFamily: '"Cabinet Grotesk", sans-serif' }}>
       {/* LEFT STRIP - Step Progress */}
-      <div style={{ width: '80px', backgroundColor: '#f7f6f3', borderRight: '1px solid #ebebea', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 0', flexShrink: 0 }}>
+      <div className="auth-left-strip" style={{ width: '80px', backgroundColor: '#f7f6f3', borderRight: '1px solid #ebebea', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 0', flexShrink: 0 }}>
         {STEPS.map(({ n, label }, i) => {
           const idx = i + 1;
           const active = idx === 1;
@@ -111,7 +111,7 @@ export default function RegisterPage() {
       {/* MAIN AREA */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         {/* Top bar */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 48px', borderBottom: '1px solid #ebebea' }}>
+        <div className="auth-topbar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 48px', borderBottom: '1px solid #ebebea' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div style={{ width: '30px', height: '30px', borderRadius: '8px', backgroundColor: '#dc2626', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <span style={{ color: '#ffffff', fontWeight: 900, fontSize: '12px', letterSpacing: '-0.05em' }}>V</span>
@@ -125,9 +125,9 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        <div style={{ flex: 1, display: 'flex' }}>
+        <div className="auth-main-row" style={{ flex: 1, display: 'flex' }}>
           {/* Form area */}
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 48px' }}>
+          <div className="auth-form-wrap" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 48px' }}>
             <motion.div 
               style={{ width: '100%', maxWidth: '400px' }}
               initial={{ opacity: 0, x: 28 }}
