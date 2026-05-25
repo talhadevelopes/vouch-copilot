@@ -1,4 +1,5 @@
 import express, { type Express } from 'express';
+import cors from 'cors';
 import { env } from './utils/env';
 
 // Routes
@@ -13,45 +14,38 @@ import { ApiResponse } from './utils/api-response';
 
 const app: Express = express();
 
-// Middleware
 app.use(express.json());
+
+const allowedOrigins = [
+  env.CLIENT_URL,
+  /^chrome-extension:\/\/[a-z]+$/
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    
+    const isAllowed = allowedOrigins.some(pattern => {
+      if (typeof pattern === 'string') return pattern === origin;
+      return pattern.test(origin);
+    });
+
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
+
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
   next();
 });
 
-app.use((req, res, next) => {
-  const origin = req.get('origin');
-  
-  // Use CLIENT_URL from env, but allow fallback for development
-  const allowedOrigin = (() => {
-    if (!origin) return env.CLIENT_URL;
-    
-    // Check if the origin matches CLIENT_URL or is a chrome extension
-    if (origin === env.CLIENT_URL) return origin;
-    if (origin.startsWith('chrome-extension://')) return origin;
-    
-    // In production, if we have a CLIENT_URL, we should trust it
-    if (process.env.NODE_ENV === 'production') {
-      return env.CLIENT_URL;
-    }
-    
-    return origin; // Fallback for dev
-  })();
-
-  res.header('Access-Control-Allow-Origin', allowedOrigin);
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-
-  next();
-});
-
-// Health check
 app.get('/health', (req, res) => {
   ApiResponse.success(res, 'Service healthy', {
     status: 'ok',
@@ -59,7 +53,6 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Route registration
 app.use('/verify', verifyRouter);
 app.use('/analyze', analyzeRouter);
 app.use('/chat', chatRouter);
@@ -68,7 +61,6 @@ app.use('/auth', authRouter);
 app.use('/dashboard', dashboardRouter);
 app.use('/public', publicRouter);
 
-// Error handling
 app.use((err: any, req: any, res: any, next: any) => {
   console.error('[API Error]', err);
   ApiResponse.error(res, 'Internal server error', 'INTERNAL_SERVER_ERROR', 500);
@@ -76,7 +68,6 @@ app.use((err: any, req: any, res: any, next: any) => {
 
 const PORT = env.PORT;
 
-// Only start the server if we're not running in a serverless environment (like Vercel)
 if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log(`Vouch server running on port ${PORT}`);
