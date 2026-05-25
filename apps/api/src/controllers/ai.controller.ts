@@ -3,7 +3,6 @@ import { analyzeService } from "../services/ai/analyze";
 import { chatService } from "../services/ai/chat";
 import { verifyService } from "../services/ai/verify";
 import { cacheService } from "../services/cache";
-import { createSSEStream } from "../utils/sse";
 import { ApiResponse } from "../utils/api-response";
 import { analyzeSchema, chatSchema, scanSchema, verifySchema } from "../validators/ai.validator";
 import type { AuthRequest } from "../middleware/auth";
