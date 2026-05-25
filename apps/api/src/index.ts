@@ -22,17 +22,27 @@ app.use((req, res, next) => {
 
 app.use((req, res, next) => {
   const origin = req.get('origin');
+  
+  // Use CLIENT_URL from env, but allow fallback for development
   const allowedOrigin = (() => {
     if (!origin) return env.CLIENT_URL;
+    
+    // Check if the origin matches CLIENT_URL or is a chrome extension
     if (origin === env.CLIENT_URL) return origin;
     if (origin.startsWith('chrome-extension://')) return origin;
-    return env.CLIENT_URL;
+    
+    // In production, if we have a CLIENT_URL, we should trust it
+    if (process.env.NODE_ENV === 'production') {
+      return env.CLIENT_URL;
+    }
+    
+    return origin; // Fallback for dev
   })();
 
   res.header('Access-Control-Allow-Origin', allowedOrigin);
   res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
 
   if (req.method === 'OPTIONS') {
     return res.sendStatus(200);
