@@ -6,7 +6,7 @@ export async function sendOtpEmail(email: string, code: string) {
   }
 
   const auth = Buffer.from(`${env.MAILJET_API_KEY}:${env.MAILJET_API_SECRET}`).toString("base64");
-  const response = await fetch("https://api.mailjet.com/v3.1/send", {
+  const response: any = await fetch("https://api.mailjet.com/v3.1/send", {
     method: "POST",
     headers: {
       Authorization: `Basic ${auth}`,
