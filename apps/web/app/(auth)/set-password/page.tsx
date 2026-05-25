@@ -76,7 +76,7 @@ export default function SetPasswordPage() {
     },
   });
 
-  const canSubmit = password && !mismatch && agreed && !setPasswordMutation.isPending && pwStrength >= 2;
+  const canSubmit = !!(password && confirm && password === confirm && agreed && !setPasswordMutation.isPending && pwStrength >= 2);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -263,14 +263,19 @@ export default function SetPasswordPage() {
                       <div className="flex items-start gap-2.5 py-1">
                         <button 
                           type="button" 
+                          id="terms-checkbox"
                           onClick={() => setAgreed(!agreed)} 
                           className={`w-4.5 h-4.5 rounded-md border-1.5 flex items-center justify-center shrink-0 mt-0.5 transition-all ${agreed ? "bg-vouch-red border-vouch-red" : "border-gray-300 bg-white hover:border-vouch-red"}`}
                         >
                           {agreed && <CheckCircle2 size={10} className="text-white" />}
                         </button>
-                        <p className="text-gray-500 text-xs font-medium leading-relaxed">
-                          I agree to Vouch's <a href="#" className="text-gray-700 font-bold hover:text-vouch-red">Terms of Service</a> & <a href="#" className="text-gray-700 font-bold hover:text-vouch-red">Privacy Policy</a>
-                        </p>
+                        <label 
+                          htmlFor="terms-checkbox"
+                          className="text-gray-500 text-xs font-medium leading-relaxed cursor-pointer select-none"
+                          onClick={() => setAgreed(!agreed)}
+                        >
+                          I agree to Vouch's <a href="#" onClick={(e) => e.stopPropagation()} className="text-gray-700 font-bold hover:text-vouch-red">Terms of Service</a> & <a href="#" onClick={(e) => e.stopPropagation()} className="text-gray-700 font-bold hover:text-vouch-red">Privacy Policy</a>
+                        </label>
                       </div>
 
                       <button 
