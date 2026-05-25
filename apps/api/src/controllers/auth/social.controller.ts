@@ -1,4 +1,4 @@
-import type { Response } from "express";
+import type { Response as ExpressResponse } from "express";
 import { prisma } from "../../db/prisma";
 import { hashPassword } from "../../services/auth/password";
 import { ApiResponse } from "../../utils/api-response";
@@ -8,7 +8,7 @@ import { issueTokens } from "./core.controller";
 import type { AuthRequest } from "../../middleware/auth";
 
 export class SocialAuthController {
-    static async googleLogin(req: AuthRequest, res: Response) {
+    static async googleLogin(req: AuthRequest, res: ExpressResponse) {
     const parsed = googleLoginSchema.safeParse(req.body);
     if (!parsed.success) {
       return ApiResponse.error(res, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
