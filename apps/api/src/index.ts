@@ -14,8 +14,6 @@ import { ApiResponse } from './utils/api-response';
 
 const app: Express = express();
 
-app.use(express.json());
-
 const allowedOrigins = [
   env.CLIENT_URL,
   /^chrome-extension:\/\/[a-z]+$/
@@ -24,12 +22,10 @@ const allowedOrigins = [
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
-    
     const isAllowed = allowedOrigins.some(pattern => {
       if (typeof pattern === 'string') return pattern === origin;
       return pattern.test(origin);
     });
-
     if (isAllowed) {
       callback(null, true);
     } else {
@@ -38,8 +34,12 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200
 }));
+
+// Middleware
+app.use(express.json());
 
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
