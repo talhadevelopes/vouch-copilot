@@ -21,7 +21,7 @@ export class SocialAuthController {
       return ApiResponse.error(res, "Invalid Google token", "UNAUTHORIZED", 401);
     }
 
-    const tokenInfo = (await verifyRes.json()) as GoogleTokenInfo
+    const tokenInfo = (await verifyRes.json()) as GoogleTokenInfo;
     if (!tokenInfo.email) {
       return ApiResponse.error(res, "Google account email is missing", "UNAUTHORIZED", 401);
     }
