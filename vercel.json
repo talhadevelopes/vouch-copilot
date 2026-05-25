@@ -1,9 +1,9 @@
 {
   "version": 2,
-  "buildCommand": "cd apps/api && npm install && npm run build",
-  "outputDirectory": "apps/api/dist",
+  "buildCommand": "pnpm install && pnpm build",
+  "outputDirectory": "apps/web/.next",
   "functions": {
-    "apps/api/dist/index.js": {
+    "apps/api/api/index.ts": {
       "runtime": "nodejs20.x",
       "memory": 1024,
       "maxDuration": 60
@@ -12,7 +12,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "apps/api/dist/index.js"
+      "destination": "apps/api/api/index.ts"
     },
     {
       "source": "/(.*)",
