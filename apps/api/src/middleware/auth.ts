@@ -1,37 +1,35 @@
-import { createMiddleware } from "hono/factory";
+import type { Request, Response, NextFunction } from "express";
 import { verifyAccessToken } from "../services/auth/jwt";
 import { ApiResponse } from "../utils/api-response";
 import { prisma } from "../db/prisma";
 
-export type AuthContext = {
-  Variables: {
-    userId: string;
-    userEmail: string;
-  };
-};
+export interface AuthRequest extends Request {
+  userId?: string;
+  userEmail?: string;
+}
 
-export const requireAuth = createMiddleware<AuthContext>(async (c, next) => {
-  const authHeader = c.req.header("authorization");
+export const requireAuth = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  const authHeader = req.get("authorization");
   const bearerToken = authHeader?.startsWith("Bearer ")
     ? authHeader.slice("Bearer ".length)
     : "";
   const token = bearerToken;
 
   if (!token) {
-    return ApiResponse.error(c, "Unauthorized", "UNAUTHORIZED", 401);
+    return ApiResponse.error(res, "Unauthorized", "UNAUTHORIZED", 401);
   }
 
   try {
     const payload = verifyAccessToken(token);
     const user = await prisma.user.findUnique({ where: { id: payload.sub } });
     if (!user) {
-      return ApiResponse.error(c, "Unauthorized", "UNAUTHORIZED", 401);
+      return ApiResponse.error(res, "Unauthorized", "UNAUTHORIZED", 401);
     }
 
-    c.set("userId", user.id);
-    c.set("userEmail", user.email);
-    await next();
+    req.userId = user.id;
+    req.userEmail = user.email;
+    next();
   } catch {
-    return ApiResponse.error(c, "Unauthorized", "UNAUTHORIZED", 401);
+    return ApiResponse.error(res, "Unauthorized", "UNAUTHORIZED", 401);
   }
-});
+};

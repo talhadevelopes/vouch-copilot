@@ -1,30 +1,29 @@
+import type { Response } from "express";
 import { prisma } from "../../db/prisma";
 import { hashPassword } from "../../services/auth/password";
 import { ApiResponse } from "../../utils/api-response";
-import type { Context } from "hono";
 import { googleLoginSchema } from "../../validators/auth.validator";
 import type { GoogleTokenInfo } from "../../types";
 import { issueTokens } from "./core.controller";
-
-
+import type { AuthRequest } from "../../middleware/auth";
 
 export class SocialAuthController {
-    static async googleLogin(c: Context) {
-    const parsed = googleLoginSchema.safeParse(await c.req.json());
+    static async googleLogin(req: AuthRequest, res: Response) {
+    const parsed = googleLoginSchema.safeParse(req.body);
     if (!parsed.success) {
-      return ApiResponse.error(c, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
+      return ApiResponse.error(res, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
     }
 
     const verifyRes = await fetch(
       `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${encodeURIComponent(parsed.data.accessToken)}`,
     );
     if (!verifyRes.ok) {
-      return ApiResponse.error(c, "Invalid Google token", "UNAUTHORIZED", 401);
+      return ApiResponse.error(res, "Invalid Google token", "UNAUTHORIZED", 401);
     }
 
     const tokenInfo = (await verifyRes.json()) as GoogleTokenInfo
     if (!tokenInfo.email) {
-      return ApiResponse.error(c, "Google account email is missing", "UNAUTHORIZED", 401);
+      return ApiResponse.error(res, "Google account email is missing", "UNAUTHORIZED", 401);
     }
 
     const email = tokenInfo.email.toLowerCase();
@@ -44,7 +43,7 @@ export class SocialAuthController {
     });
 
     const { accessToken, refreshToken } = await issueTokens(user);
-    return ApiResponse.success(c, "Google login successful", {
+    return ApiResponse.success(res, "Google login successful", {
       user: { id: user.id, email: user.email, name: user.name },
       accessToken,
       refreshToken,

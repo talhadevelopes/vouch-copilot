@@ -1,12 +1,13 @@
-import { type Context } from "hono";
+import type { Response } from "express";
 import { ApiResponse } from "../utils/api-response";
 import { createAnalysisSchema, updateAnalysisSchema } from "../validators/dashboard.validator";
 import { prisma } from "../db/prisma";
 import { analyzeService } from "../services/ai/analyze";
+import type { AuthRequest } from "../middleware/auth";
 
 export class DashboardController {
-  static async getHistory(c: Context) {
-    const userId = c.get("userId");
+  static async getHistory(req: AuthRequest, res: Response) {
+    const userId = req.userId!;
     const history = await prisma.analysis.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
@@ -23,14 +24,14 @@ export class DashboardController {
         biasData: true,
       },
     });
-    return ApiResponse.success(c, "History fetched", { history });
+    return ApiResponse.success(res, "History fetched", { history });
   }
 
-  static async createAnalysis(c: Context) {
-    const userId = c.get("userId");
-    const parsed = createAnalysisSchema.safeParse(await c.req.json());
+  static async createAnalysis(req: AuthRequest, res: Response) {
+    const userId = req.userId!;
+    const parsed = createAnalysisSchema.safeParse(req.body);
     if (!parsed.success) {
-      return ApiResponse.error(c, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
+      return ApiResponse.error(res, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
     }
     const {
       inputUrl, pageTitle, content,
@@ -42,7 +43,6 @@ export class DashboardController {
     let finalProof = proof;
     let finalBiasScore = biasScore;
 
-    // Only run AI if no data was provided (e.g. from web dashboard URL input)
     if (!aiResponse && !biasScore && !claimsData) {
       const simulated = await analyzeService.analyzeLanguage(
         content
@@ -70,16 +70,16 @@ export class DashboardController {
       },
     });
 
-    return ApiResponse.success(c, "Analysis created", { item }, 201);
+    return ApiResponse.success(res, "Analysis created", { item }, 201);
   }
 
-  static async updateAnalysis(c: Context) {
-    const userId = c.get("userId");
-    const analysisId = c.req.param("id");
-    const parsed = updateAnalysisSchema.safeParse(await c.req.json());
-    
+  static async updateAnalysis(req: AuthRequest, res: Response) {
+    const userId = req.userId!;
+    const analysisId = req.params.id;
+    const parsed = updateAnalysisSchema.safeParse(req.body);
+
     if (!parsed.success) {
-      return ApiResponse.error(c, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
+      return ApiResponse.error(res, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
     }
 
     const item = await prisma.analysis.findFirst({
@@ -87,7 +87,7 @@ export class DashboardController {
     });
 
     if (!item) {
-      return ApiResponse.error(c, "Analysis not found", "NOT_FOUND", 404);
+      return ApiResponse.error(res, "Analysis not found", "NOT_FOUND", 404);
     }
 
     const updated = await prisma.analysis.update({
@@ -100,29 +100,29 @@ export class DashboardController {
       },
     });
 
-    return ApiResponse.success(c, "Analysis updated", { item: updated });
+    return ApiResponse.success(res, "Analysis updated", { item: updated });
   }
 
-  static async getAnalysisById(c: Context) {
-    const userId = c.get("userId");
-    const analysisId = c.req.param("id");
+  static async getAnalysisById(req: AuthRequest, res: Response) {
+    const userId = req.userId!;
+    const analysisId = req.params.id;
     const item = await prisma.analysis.findFirst({
       where: { id: analysisId, userId },
     });
     if (!item) {
-      return ApiResponse.error(c, "Analysis not found", "NOT_FOUND", 404);
+      return ApiResponse.error(res, "Analysis not found", "NOT_FOUND", 404);
     }
-    return ApiResponse.success(c, "Analysis fetched", { item });
+    return ApiResponse.success(res, "Analysis fetched", { item });
   }
 
-  static async createShareLink(c: Context) {
-    const userId = c.get("userId");
-    const analysisId = c.req.param("id");
+  static async createShareLink(req: AuthRequest, res: Response) {
+    const userId = req.userId!;
+    const analysisId = req.params.id;
     const item = await prisma.analysis.findFirst({
       where: { id: analysisId, userId },
     });
     if (!item) {
-      return ApiResponse.error(c, "Analysis not found", "NOT_FOUND", 404);
+      return ApiResponse.error(res, "Analysis not found", "NOT_FOUND", 404);
     }
     const shareId = item.shareId || `shr_${crypto.randomUUID()}`;
     if (!item.shareId) {
@@ -131,16 +131,16 @@ export class DashboardController {
         data: { shareId },
       });
     }
-    return ApiResponse.success(c, "Share link created", { shareId });
+    return ApiResponse.success(res, "Share link created", { shareId });
   }
 
-  static async getPublicAnalysis(c: Context) {
-    const shareId = c.req.param("shareId");
+  static async getPublicAnalysis(req: AuthRequest, res: Response) {
+    const shareId = req.params.shareId;
     const item = await prisma.analysis.findFirst({ where: { shareId } });
     if (!item) {
-      return ApiResponse.error(c, "Shared analysis not found", "NOT_FOUND", 404);
+      return ApiResponse.error(res, "Shared analysis not found", "NOT_FOUND", 404);
     }
-    return ApiResponse.success(c, "Shared analysis fetched", {
+    return ApiResponse.success(res, "Shared analysis fetched", {
       item: {
         id: item.id,
         inputUrl: item.inputUrl,

@@ -1,6 +1,4 @@
-import { Hono } from 'hono';
-import { logger } from 'hono/logger';
-import { cors } from 'hono/cors';
+import express, { type Express } from 'express';
 import { env } from './utils/env';
 
 // Routes
@@ -13,47 +11,62 @@ import dashboardRouter from './routes/dashboard';
 import publicRouter from './routes/public';
 import { ApiResponse } from './utils/api-response';
 
-const app = new Hono();
+const app: Express = express();
 
 // Middleware
-app.use('*', logger());
-app.use('*', cors({
-  origin: (origin) => {
+app.use(express.json());
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next();
+});
+
+app.use((req, res, next) => {
+  const origin = req.get('origin');
+  const allowedOrigin = (() => {
     if (!origin) return env.CLIENT_URL;
     if (origin === env.CLIENT_URL) return origin;
     if (origin.startsWith('chrome-extension://')) return origin;
     return env.CLIENT_URL;
-  },
-  allowMethods: ['GET', 'POST', 'OPTIONS'],
-  allowHeaders: ['Content-Type', 'Authorization'],
-}));
+  })();
+
+  res.header('Access-Control-Allow-Origin', allowedOrigin);
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
 
 // Health check
-app.get('/health', (c) => {
-  return ApiResponse.success(c, 'Service healthy', {
+app.get('/health', (req, res) => {
+  ApiResponse.success(res, 'Service healthy', {
     status: 'ok',
     timestamp: new Date().toISOString(),
   });
 });
 
 // Route registration
-app.route('/verify', verifyRouter);
-app.route('/analyze', analyzeRouter);
-app.route('/chat', chatRouter);
-app.route('/scan', scanRouter);
-app.route('/auth', authRouter);
-app.route('/dashboard', dashboardRouter);
-app.route('/public', publicRouter);
+app.use('/verify', verifyRouter);
+app.use('/analyze', analyzeRouter);
+app.use('/chat', chatRouter);
+app.use('/scan', scanRouter);
+app.use('/auth', authRouter);
+app.use('/dashboard', dashboardRouter);
+app.use('/public', publicRouter);
 
-app.onError((error, c) => {
-  console.error('[API Error]', error);
-  return ApiResponse.error(c, 'Internal server error', 'INTERNAL_SERVER_ERROR', 500);
+// Error handling
+app.use((err: any, req: any, res: any, next: any) => {
+  console.error('[API Error]', err);
+  ApiResponse.error(res, 'Internal server error', 'INTERNAL_SERVER_ERROR', 500);
 });
 
-console.log(`Vouch server running on port ${env.PORT}`);
+const PORT = env.PORT;
+const server = app.listen(PORT, () => {
+  console.log(`Vouch server running on port ${PORT}`);
+});
 
-export default {
-  port: env.PORT,
-  fetch: app.fetch,
-  idleTimeout: 120,
-};
+export default app;

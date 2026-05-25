@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "buildCommand": "cd apps/api && npm install && npm run build",
+  "outputDirectory": "apps/api/dist",
+  "functions": {
+    "apps/api/dist/index.js": {
+      "runtime": "nodejs20.x",
+      "memory": 1024,
+      "maxDuration": 60
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "apps/api/dist/index.js"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "apps/web/$1"
+    }
+  ]
+}

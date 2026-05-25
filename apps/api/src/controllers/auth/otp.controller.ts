@@ -1,18 +1,17 @@
+import type { Response } from "express";
 import { prisma } from "../../db/prisma";
 import { hashPassword } from "../../services/auth/password";
 import { ApiResponse } from "../../utils/api-response";
-import type { Context } from "hono";
 import { otpRequestSchema, otpVerifySchema, setPasswordSchema } from "../../validators/auth.validator";
 import { issueTokens } from "./core.controller";
 import { sendOtpEmail } from "../../services/auth/mail";
-
-
+import type { AuthRequest } from "../../middleware/auth";
 
 export class OTPController {
-    static async requestOtp(c: Context) {
-        const parsed = otpRequestSchema.safeParse(await c.req.json());
+    static async requestOtp(req: AuthRequest, res: Response) {
+        const parsed = otpRequestSchema.safeParse(req.body);
         if (!parsed.success) {
-            return ApiResponse.error(c, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
+            return ApiResponse.error(res, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
         }
 
         const email = parsed.data.email.toLowerCase();
@@ -32,20 +31,20 @@ export class OTPController {
             await sendOtpEmail(email, code);
         } catch (error) {
             return ApiResponse.error(
-                c,
+                res,
                 error instanceof Error ? error.message : "Unable to send OTP",
                 "MAIL_ERROR",
                 500,
             );
         }
 
-        return ApiResponse.success(c, "OTP sent successfully", { email });
+        return ApiResponse.success(res, "OTP sent successfully", { email });
     }
 
-    static async verifyOtp(c: Context) {
-        const parsed = otpVerifySchema.safeParse(await c.req.json());
+    static async verifyOtp(req: AuthRequest, res: Response) {
+        const parsed = otpVerifySchema.safeParse(req.body);
         if (!parsed.success) {
-            return ApiResponse.error(c, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
+            return ApiResponse.error(res, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
         }
 
         const email = parsed.data.email.toLowerCase();
@@ -63,7 +62,7 @@ export class OTPController {
         });
 
         if (!otp) {
-            return ApiResponse.error(c, "Invalid or expired OTP", "UNAUTHORIZED", 401);
+            return ApiResponse.error(res, "Invalid or expired OTP", "UNAUTHORIZED", 401);
         }
 
         const existing = await prisma.user.findUnique({ where: { email } });
@@ -92,18 +91,18 @@ export class OTPController {
         });
 
         const { accessToken, refreshToken } = await issueTokens(user);
-        return ApiResponse.success(c, "OTP login successful", {
+        return ApiResponse.success(res, "OTP login successful", {
             user: { id: user.id, email: user.email, name: user.name },
             accessToken,
             refreshToken,
         });
     }
 
-    static async setPassword(c: Context) {
-        const userId = c.get("userId");
-        const parsed = setPasswordSchema.safeParse(await c.req.json());
+    static async setPassword(req: AuthRequest, res: Response) {
+        const userId = req.userId;
+        const parsed = setPasswordSchema.safeParse(req.body);
         if (!parsed.success) {
-            return ApiResponse.error(c, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
+            return ApiResponse.error(res, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
         }
 
         const { password } = parsed.data;
@@ -114,6 +113,6 @@ export class OTPController {
             data: { passwordHash },
         });
 
-        return ApiResponse.success(c, "Password updated successfully", { ok: true });
+        return ApiResponse.success(res, "Password updated successfully", { ok: true });
     }
 }

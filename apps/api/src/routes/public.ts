@@ -1,7 +1,7 @@
-import { Hono } from "hono";
+import { Router, type Router as ExpressRouter } from "express";
 import { DashboardController } from "../controllers/dashboard.controller";
 
-const router = new Hono();
+const router: ExpressRouter = Router();
 
 router.get("/analysis/:shareId", DashboardController.getPublicAnalysis);
 

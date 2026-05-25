@@ -1,14 +1,14 @@
+import type { Response } from "express";
 import { prisma } from "../../db/prisma";
 import { ApiResponse } from "../../utils/api-response";
-import type { Context } from "hono";
 import { extensionCodeExchangeSchema } from "../../validators/auth.validator";
 import { issueTokens } from "./core.controller";
-
+import type { AuthRequest } from "../../middleware/auth";
 
 export class ExtensionAuthController {
 
-    static async createExtensionLinkCode(c: Context) {
-        const userId = c.get("userId");
+    static async createExtensionLinkCode(req: AuthRequest, res: Response) {
+        const userId = req.userId!;
         const now = new Date();
 
         // Look for a valid existing code first
@@ -22,7 +22,7 @@ export class ExtensionAuthController {
         });
 
         if (existing) {
-            return ApiResponse.success(c, "Existing code reused", {
+            return ApiResponse.success(res, "Existing code reused", {
                 code: existing.code,
                 expiresAt: existing.expiresAt,
             });
@@ -39,13 +39,13 @@ export class ExtensionAuthController {
             },
         });
 
-        return ApiResponse.success(c, "Extension link code created", { code, expiresAt });
+        return ApiResponse.success(res, "Extension link code created", { code, expiresAt });
     }
 
-    static async exchangeExtensionLinkCode(c: Context) {
-        const parsed = extensionCodeExchangeSchema.safeParse(await c.req.json());
+    static async exchangeExtensionLinkCode(req: AuthRequest, res: Response) {
+        const parsed = extensionCodeExchangeSchema.safeParse(req.body);
         if (!parsed.success) {
-            return ApiResponse.error(c, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
+            return ApiResponse.error(res, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
         }
 
         const code = parsed.data.code;
@@ -59,7 +59,7 @@ export class ExtensionAuthController {
         });
 
         if (!link) {
-            return ApiResponse.error(c, "Invalid or expired code", "UNAUTHORIZED", 401);
+            return ApiResponse.error(res, "Invalid or expired code", "UNAUTHORIZED", 401);
         }
 
         await prisma.extensionLinkCode.update({
@@ -68,7 +68,7 @@ export class ExtensionAuthController {
         });
 
         const { accessToken, refreshToken } = await issueTokens(link.user);
-        return ApiResponse.success(c, "Extension linked successfully", {
+        return ApiResponse.success(res, "Extension linked successfully", {
             user: { id: link.user.id, email: link.user.email, name: link.user.name },
             accessToken,
             refreshToken,

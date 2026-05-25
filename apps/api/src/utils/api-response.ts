@@ -1,4 +1,4 @@
-import type { Context } from "hono";
+import type { Response } from "express";
 
 export type ApiSuccess<T> = {
   status: "success";
@@ -16,17 +16,17 @@ export type ApiError = {
 };
 
 export class ApiResponse {
-  static success<T>(c: Context, message: string, data: T, httpStatus = 200) {
+  static success<T>(res: Response, message: string, data: T, httpStatus = 200) {
     const payload: ApiSuccess<T> = {
       status: "success",
       message,
       data,
     };
-    return c.json(payload, httpStatus as any);
+    return res.status(httpStatus).json(payload);
   }
 
   static error(
-    c: Context,
+    res: Response,
     message: string,
     code = "BAD_REQUEST",
     httpStatus = 400,
@@ -40,6 +40,6 @@ export class ApiResponse {
         ...(details !== undefined ? { details } : {}),
       },
     };
-    return c.json(payload, httpStatus as any);
+    return res.status(httpStatus).json(payload);
   }
 }

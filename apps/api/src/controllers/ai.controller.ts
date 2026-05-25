@@ -1,5 +1,4 @@
-import type { Context } from "hono";
-import { stream } from "hono/streaming";
+import type { Response } from "express";
 import { analyzeService } from "../services/ai/analyze";
 import { chatService } from "../services/ai/chat";
 import { verifyService } from "../services/ai/verify";
@@ -7,37 +6,36 @@ import { cacheService } from "../services/cache";
 import { createSSEStream } from "../utils/sse";
 import { ApiResponse } from "../utils/api-response";
 import { analyzeSchema, chatSchema, scanSchema, verifySchema } from "../validators/ai.validator";
+import type { AuthRequest } from "../middleware/auth";
 
 export class AIController {
-  static async scan(c: Context) {
-    const parsed = scanSchema.safeParse(await c.req.json());
+  static async scan(req: AuthRequest, res: Response) {
+    const parsed = scanSchema.safeParse(req.body);
     if (!parsed.success) {
-      return ApiResponse.error(c, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
+      return ApiResponse.error(res, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
     }
     const { pageContent, pageUrl } = parsed.data;
 
     try {
-      // Run BOTH in parallel on the backend - we have higher server-side quotas/timeouts usually
-      // and it's much more efficient than the extension doing 2 round trips.
       const [claims, analysis] = await Promise.all([
         verifyService.extractAndVerifyClaims(pageContent),
         analyzeService.analyzeLanguage(pageContent)
       ]);
 
-      return ApiResponse.success(c, "Scan completed", {
+      return ApiResponse.success(res, "Scan completed", {
         claims,
         analysis
       });
     } catch (error: any) {
       console.error("[Vouch] Full scan failed:", error);
-      return ApiResponse.error(c, error?.message || "Scan failed", "SCAN_ERROR", 500);
+      return ApiResponse.error(res, error?.message || "Scan failed", "SCAN_ERROR", 500);
     }
   }
 
-  static async analyze(c: Context) {
-    const parsed = analyzeSchema.safeParse(await c.req.json());
+  static async analyze(req: AuthRequest, res: Response) {
+    const parsed = analyzeSchema.safeParse(req.body);
     if (!parsed.success) {
-      return ApiResponse.error(c, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
+      return ApiResponse.error(res, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
     }
     const { pageContent, pageUrl } = parsed.data;
     const cacheKey = pageUrl ? `analyze:${pageUrl}` : null;
@@ -45,74 +43,81 @@ export class AIController {
     if (cacheKey) {
       const cached = await cacheService.get(cacheKey);
       if (cached) {
-        return ApiResponse.success(c, "Analysis fetched from cache", cached);
+        return ApiResponse.success(res, "Analysis fetched from cache", cached);
       }
     }
 
     try {
       const analysis = await analyzeService.analyzeLanguage(pageContent);
       if (cacheKey) await cacheService.set(cacheKey, analysis);
-      return ApiResponse.success(c, "Analysis completed", analysis);
+      return ApiResponse.success(res, "Analysis completed", analysis);
     } catch (error: any) {
-      return ApiResponse.error(c, error?.message || "Analysis failed", "ANALYZE_ERROR", 500);
+      return ApiResponse.error(res, error?.message || "Analysis failed", "ANALYZE_ERROR", 500);
     }
   }
 
-  static async verify(c: Context) {
-    const parsed = verifySchema.safeParse(await c.req.json());
+  static async verify(req: AuthRequest, res: Response) {
+    const parsed = verifySchema.safeParse(req.body);
     if (!parsed.success) {
-      return ApiResponse.error(c, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
+      return ApiResponse.error(res, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
     }
     const { pageContent, pageUrl, claim, streamResponse } = parsed.data;
 
     if (typeof claim === "string" && claim.trim().length > 0 && streamResponse) {
-      return createSSEStream(async (send) => {
+      res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-cache, no-transform');
+      res.setHeader('Connection', 'keep-alive');
+      res.setHeader('X-Accel-Buffering', 'no');
+
+      try {
         const fullText = await verifyService.verifyClaimStream(claim.trim(), (token) =>
-          send({ type: "token", text: token }),
+          res.write(`data: ${JSON.stringify({ type: "token", text: token })}\n\n`)
         );
-        send({ type: "final", text: fullText });
-      });
+        res.write(`data: ${JSON.stringify({ type: "final", text: fullText })}\n\n`);
+        res.end();
+      } catch (error) {
+        console.error('[SSE] Stream handler error:', error);
+        res.end();
+      }
+      return;
     }
 
     if (typeof claim === "string" && claim.trim().length > 0) {
       const result = await verifyService.verifyClaim(claim.trim());
-      return stream(c, async (s) => {
-        await s.write(JSON.stringify(result) + "\n");
-      });
+      res.write(JSON.stringify(result) + "\n");
+      return res.end();
     }
 
     if (!pageContent) {
-      return ApiResponse.error(c, "pageContent is required", "VALIDATION_ERROR", 400);
+      return ApiResponse.error(res, "pageContent is required", "VALIDATION_ERROR", 400);
     }
 
     const cacheKey = pageUrl ? `verify:${pageUrl}` : null;
     if (cacheKey) {
       const cached = await cacheService.get(cacheKey);
       if (cached) {
-        return stream(c, async (s) => {
-          const results = Array.isArray(cached) ? cached : [cached];
-          for (const res of results) {
-            await s.write(JSON.stringify(res) + "\n");
-          }
-        });
+        const results = Array.isArray(cached) ? cached : [cached];
+        for (const r of results) {
+          res.write(JSON.stringify(r) + "\n");
+        }
+        return res.end();
       }
     }
 
-    return stream(c, async (s) => {
-      const results = await verifyService.extractAndVerifyClaims(pageContent);
-      for (const result of results) {
-        await s.write(JSON.stringify(result) + "\n");
-      }
-      if (cacheKey && results.length > 0) {
-        await cacheService.set(cacheKey, results);
-      }
-    });
+    const results = await verifyService.extractAndVerifyClaims(pageContent);
+    for (const result of results) {
+      res.write(JSON.stringify(result) + "\n");
+    }
+    if (cacheKey && results.length > 0) {
+      await cacheService.set(cacheKey, results);
+    }
+    res.end();
   }
 
-  static async chat(c: Context) {
-    const parsed = chatSchema.safeParse(await c.req.json());
+  static async chat(req: AuthRequest, res: Response) {
+    const parsed = chatSchema.safeParse(req.body);
     if (!parsed.success) {
-      return ApiResponse.error(c, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
+      return ApiResponse.error(res, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
     }
     const { message, pageContent, messages, computeSourceSentence } = parsed.data;
     const chatMessages =
@@ -123,17 +128,26 @@ export class AIController {
           : [];
 
     if (chatMessages.length === 0) {
-      return ApiResponse.error(c, "message or messages are required", "VALIDATION_ERROR", 400);
+      return ApiResponse.error(res, "message or messages are required", "VALIDATION_ERROR", 400);
     }
 
-    return createSSEStream(async (send) => {
+    res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache, no-transform');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no');
+
+    try {
       const { answer, sourceSentence } = await chatService.chatStream(
         chatMessages,
         pageContent,
-        (token) => send({ type: "token", text: token }),
+        (token) => res.write(`data: ${JSON.stringify({ type: "token", text: token })}\n\n`),
         computeSourceSentence !== false,
       );
-      send({ type: "final", answer, sourceSentence });
-    });
+      res.write(`data: ${JSON.stringify({ type: "final", answer, sourceSentence })}\n\n`);
+      res.end();
+    } catch (error) {
+      console.error('[SSE] Stream handler error:', error);
+      res.end();
+    }
   }
 }

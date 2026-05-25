@@ -1,9 +1,10 @@
+import type { Response } from "express";
 import { prisma } from "../../db/prisma";
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../../services/auth/jwt";
 import { comparePassword, hashPassword } from "../../services/auth/password";
 import { ApiResponse } from "../../utils/api-response";
 import { loginSchema, refreshSchema, registerSchema } from "../../validators/auth.validator";
-import type { Context } from "hono";
+import type { AuthRequest } from "../../middleware/auth";
 
 export async function issueTokens(user: { id: string; email: string }) {
     const accessToken = signAccessToken({ sub: user.id, email: user.email });
@@ -17,16 +18,16 @@ export async function issueTokens(user: { id: string; email: string }) {
 }
 
 export class CoreAuthController {
-    static async register(c: Context) {
-        const parsed = registerSchema.safeParse(await c.req.json());
+    static async register(req: AuthRequest, res: Response) {
+        const parsed = registerSchema.safeParse(req.body);
         if (!parsed.success) {
-            return ApiResponse.error(c, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
+            return ApiResponse.error(res, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
         }
         const { email, password, name } = parsed.data;
 
         const existing = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
         if (existing) {
-            return ApiResponse.error(c, "User already exists", "CONFLICT", 409);
+            return ApiResponse.error(res, "User already exists", "CONFLICT", 409);
         }
 
         const user = await prisma.user.create({
@@ -41,40 +42,40 @@ export class CoreAuthController {
         const { accessToken, refreshToken } = await issueTokens(user);
 
         return ApiResponse.success(
-            c,
+            res,
             "Registration successful",
             { user: { id: user.id, email: user.email, name: user.name }, accessToken, refreshToken },
             201,
         );
     }
 
-    static async login(c: Context) {
-        const parsed = loginSchema.safeParse(await c.req.json());
+    static async login(req: AuthRequest, res: Response) {
+        const parsed = loginSchema.safeParse(req.body);
         if (!parsed.success) {
-            return ApiResponse.error(c, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
+            return ApiResponse.error(res, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
         }
         const { email, password } = parsed.data;
 
         const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
         if (!user) {
-            return ApiResponse.error(c, "Invalid credentials", "UNAUTHORIZED", 401);
+            return ApiResponse.error(res, "Invalid credentials", "UNAUTHORIZED", 401);
         }
 
         const isValid = await comparePassword(password, user.passwordHash);
         if (!isValid) {
-            return ApiResponse.error(c, "Invalid credentials", "UNAUTHORIZED", 401);
+            return ApiResponse.error(res, "Invalid credentials", "UNAUTHORIZED", 401);
         }
 
         const { accessToken, refreshToken } = await issueTokens(user);
 
-        return ApiResponse.success(c, "Login successful", {
+        return ApiResponse.success(res, "Login successful", {
             user: { id: user.id, email: user.email, name: user.name },
             accessToken,
             refreshToken,
         });
     }
 
-    static async demoLogin(c: Context) {
+    static async demoLogin(req: AuthRequest, res: Response) {
         const demoPasswordHash = await hashPassword("demo1234");
         const demoEmail = "demo@vouch.app";
         let user = await prisma.user.findUnique({ where: { email: demoEmail } });
@@ -91,17 +92,17 @@ export class CoreAuthController {
 
         const { accessToken, refreshToken } = await issueTokens(user);
 
-        return ApiResponse.success(c, "Demo login successful", {
+        return ApiResponse.success(res, "Demo login successful", {
             user: { id: user.id, email: user.email, name: user.name },
             accessToken,
             refreshToken,
         });
     }
 
-    static async refresh(c: Context) {
-        const parsed = refreshSchema.safeParse(await c.req.json());
+    static async refresh(req: AuthRequest, res: Response) {
+        const parsed = refreshSchema.safeParse(req.body);
         if (!parsed.success) {
-            return ApiResponse.error(c, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
+            return ApiResponse.error(res, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
         }
         const { refreshToken } = parsed.data;
 
@@ -109,36 +110,36 @@ export class CoreAuthController {
             const payload = verifyRefreshToken(refreshToken);
             const user = await prisma.user.findUnique({ where: { id: payload.sub } });
             if (!user) {
-                return ApiResponse.error(c, "Unauthorized", "UNAUTHORIZED", 401);
+                return ApiResponse.error(res, "Unauthorized", "UNAUTHORIZED", 401);
             }
 
             const stored = await prisma.refreshToken.findUnique({ where: { userId: user.id } });
             if (!stored || stored.token !== refreshToken) {
-                return ApiResponse.error(c, "Invalid refresh token", "UNAUTHORIZED", 401);
+                return ApiResponse.error(res, "Invalid refresh token", "UNAUTHORIZED", 401);
             }
 
             const { accessToken: newAccess, refreshToken: newRefresh } = await issueTokens(user);
 
-            return ApiResponse.success(c, "Token refreshed", { accessToken: newAccess, refreshToken: newRefresh });
+            return ApiResponse.success(res, "Token refreshed", { accessToken: newAccess, refreshToken: newRefresh });
         } catch {
-            return ApiResponse.error(c, "Invalid refresh token", "UNAUTHORIZED", 401);
+            return ApiResponse.error(res, "Invalid refresh token", "UNAUTHORIZED", 401);
         }
     }
 
-    static async me(c: Context) {
-        const userId = c.get("userId");
+    static async me(req: AuthRequest, res: Response) {
+        const userId = req.userId;
         const user = await prisma.user.findUnique({ where: { id: userId } });
         if (!user) {
-            return ApiResponse.error(c, "Unauthorized", "UNAUTHORIZED", 401);
+            return ApiResponse.error(res, "Unauthorized", "UNAUTHORIZED", 401);
         }
-        return ApiResponse.success(c, "Current user fetched", {
+        return ApiResponse.success(res, "Current user fetched", {
             user: { id: user.id, email: user.email, name: user.name },
         });
     }
 
-    static async logout(c: Context) {
-        const userId = c.get("userId");
+    static async logout(req: AuthRequest, res: Response) {
+        const userId = req.userId;
         await prisma.refreshToken.deleteMany({ where: { userId } });
-        return ApiResponse.success(c, "Logout successful", { ok: true });
+        return ApiResponse.success(res, "Logout successful", { ok: true });
     }
 }
