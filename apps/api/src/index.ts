@@ -1,15 +1,15 @@
 import express, { type Express } from 'express';
-import { env } from './utils/env.js';
+import { env } from './utils/env';
 
 // Routes
-import verifyRouter from './routes/verify.js';
-import analyzeRouter from './routes/analyze.js';
-import chatRouter from './routes/chat.js';
-import scanRouter from './routes/scan.js';
-import authRouter from './routes/auth.js';
-import dashboardRouter from './routes/dashboard.js';
-import publicRouter from './routes/public.js';
-import { ApiResponse } from './utils/api-response.js';
+import verifyRouter from './routes/verify';
+import analyzeRouter from './routes/analyze';
+import chatRouter from './routes/chat';
+import scanRouter from './routes/scan';
+import authRouter from './routes/auth';
+import dashboardRouter from './routes/dashboard';
+import publicRouter from './routes/public';
+import { ApiResponse } from './utils/api-response';
 
 const app: Express = express();
 
