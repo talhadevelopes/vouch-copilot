@@ -89,7 +89,7 @@ export default function App() {
       saveHistory(data.url, data.title ?? '', messages);
       if (remoteId) {
         updateAnalysis(remoteId, {
-          chatHistory: messages.map(m => ({ sender: m.sender, text: m.text }))
+          chatHistory: messages.map(m => ({ sender: m.sender === 'vouch' ? 'assistant' : m.sender, text: m.text }))
         }).catch(err => console.error('Failed to sync chat to dashboard:', err));
       }
     }
@@ -102,7 +102,7 @@ export default function App() {
     setActiveTab('facts');
 
     // The backend now handles both verification and bias in a single call
-    const result = await startFullScan(data.textContent, data.url, data.title, loadId, pageLoadIdRef);
+    const result = await startFullScan(data.textContent, data.url, data.title, loadId, pageLoadIdRef, restoredMessages);
 
     // Save scan result to local sidebar history
     if (result && data.url) {

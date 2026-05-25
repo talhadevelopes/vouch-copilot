@@ -16,6 +16,7 @@ export function useVerification() {
     title: string,
     loadId: number,
     pageLoadIdRef: React.MutableRefObject<number>,
+    existingHistory?: ChatMessage[]
   ) => {
     setIsVerifying(true);
     setIsAnalyzing(true);
@@ -41,10 +42,11 @@ export function useVerification() {
             inputUrl: url,
             pageTitle: title,
             aiResponse: scanAnalysis?.overallTone,
-            proof: scanAnalysis?.manipulativeLanguage?.[0]?.reason,
+            proof: scanAnalysis?.overallTone, // Using overallTone as proof if no specific manipulative lang is found
             biasScore: scanAnalysis?.biasScore,
             claimsData: scanClaims,
             biasData: scanAnalysis,
+            chatHistory: existingHistory?.map(m => ({ sender: m.sender === 'vouch' ? 'assistant' : m.sender, text: m.text }))
           }),
         });
         
