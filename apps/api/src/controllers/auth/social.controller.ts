@@ -14,9 +14,9 @@ export class SocialAuthController {
       return ApiResponse.error(res, "Invalid request body", "VALIDATION_ERROR", 400, parsed.error.flatten());
     }
 
-    const verifyRes = (await fetch(
+    const verifyRes: any = await fetch(
       `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${encodeURIComponent(parsed.data.accessToken)}`,
-    )) as globalThis.Response;
+    );
     
     if (!verifyRes.ok) {
       return ApiResponse.error(res, "Invalid Google token", "UNAUTHORIZED", 401);
