@@ -16,25 +16,15 @@ const app: Express = express();
 
 const allowedOrigins = [
   env.CLIENT_URL,
+  "https://vouch-copilot.vercel.app",
   /^chrome-extension:\/\/[a-z]+$/
 ];
 
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    const isAllowed = allowedOrigins.some(pattern => {
-      if (typeof pattern === 'string') return pattern === origin;
-      return pattern.test(origin);
-    });
-    if (isAllowed) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
+  origin: allowedOrigins,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  credentials: true,
   optionsSuccessStatus: 200
 }));
 
@@ -68,9 +58,10 @@ app.use((err: any, req: any, res: any, next: any) => {
 
 const PORT = env.PORT;
 
+// Only start the server if we're not running in a serverless environment (like Vercel)
 if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
-  app.listen(PORT, () => {
-    console.log(`Vouch server running on port ${PORT}`);
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Vouch server running on http://0.0.0.0:${PORT}`);
   });
 }
 
