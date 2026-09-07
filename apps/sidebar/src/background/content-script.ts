@@ -1,5 +1,5 @@
+import { highlightText } from "../utils/highlighter";
 import { extractArticle } from "../utils/readability";
-import { highlightText } from "./highlighter";
 
 type ExtractMethod = "readability" | "selectors" | "bodyInnerText";
 

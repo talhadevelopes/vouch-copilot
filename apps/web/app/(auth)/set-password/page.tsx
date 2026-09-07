@@ -260,22 +260,17 @@ export default function SetPasswordPage() {
                       </div>
 
                       {/* Terms checkbox */}
-                      <div className="flex items-start gap-2.5 py-1">
+                      <div className="flex items-start gap-2.5 py-1 cursor-pointer" onClick={() => setAgreed(!agreed)}>
                         <button 
-                          type="button" 
-                          id="terms-checkbox"
-                          onClick={() => setAgreed(!agreed)} 
+                          type="button"
+                          tabIndex={-1}
                           className={`w-4.5 h-4.5 rounded-md border-1.5 flex items-center justify-center shrink-0 mt-0.5 transition-all ${agreed ? "bg-vouch-red border-vouch-red" : "border-gray-300 bg-white hover:border-vouch-red"}`}
                         >
                           {agreed && <CheckCircle2 size={10} className="text-white" />}
                         </button>
-                        <label 
-                          htmlFor="terms-checkbox"
-                          className="text-gray-500 text-xs font-medium leading-relaxed cursor-pointer select-none"
-                          onClick={() => setAgreed(!agreed)}
-                        >
+                        <span className="text-gray-500 text-xs font-medium leading-relaxed select-none">
                           I agree to Vouch's <a href="#" onClick={(e) => e.stopPropagation()} className="text-gray-700 font-bold hover:text-vouch-red">Terms of Service</a> & <a href="#" onClick={(e) => e.stopPropagation()} className="text-gray-700 font-bold hover:text-vouch-red">Privacy Policy</a>
-                        </label>
+                        </span>
                       </div>
 
                       <button 

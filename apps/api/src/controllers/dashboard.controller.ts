@@ -40,7 +40,7 @@ export class DashboardController {
     } = parsed.data;
 
     let finalAiResponse = aiResponse;
-    let finalProof = proof || aiResponse; // Fallback to aiResponse if proof is null
+    let finalProof = proof || aiResponse; 
     let finalBiasScore = biasScore;
 
     if (!aiResponse && !biasScore && !claimsData) {

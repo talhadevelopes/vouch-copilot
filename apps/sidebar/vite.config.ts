@@ -23,7 +23,7 @@ export default defineConfig({
       input: {
         sidebar: resolve(__dirname, 'sidebar.html'),
         background: resolve(__dirname, 'src/background/service-worker.ts'),
-        content: resolve(__dirname, 'src/content/content-script.ts'),
+        content: resolve(__dirname, 'src/background/content-script.ts'),
       },
       output: {
         entryFileNames: '[name].js',

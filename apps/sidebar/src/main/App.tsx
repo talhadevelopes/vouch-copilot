@@ -155,7 +155,7 @@ export default function App() {
 
   const ConnectionRequired = ({ feature }: { feature: string }) => (
     <div className="v-connection-required">
-      <div className="v-connection-required-icon">🔒</div>
+      <div className="v-connection-required-icon"><img src="/logo.png" alt="Vouch" className="v-header-logo" /></div>
       <h3 className="v-connection-required-title">{feature} is locked</h3>
       <p className="v-connection-required-text">
         Please connect your account in settings to use this feature.

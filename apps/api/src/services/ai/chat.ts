@@ -35,7 +35,7 @@ export const chatService = {
     return { answer, sourceSentence: null };
   },
 
-  // Streaming chat — emits tokens as they arrive from Gemini
+  // Streaming chat
   async chatStream(
     messages: ChatMessage[],
     pageContent: string,

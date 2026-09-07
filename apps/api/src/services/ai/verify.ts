@@ -1,5 +1,5 @@
 
-// Verification AI services — extractAndVerifyClaims, verifyClaim, verifyClaimStream.
+// Verification AI services - extractAndVerifyClaims, verifyClaim, verifyClaimStream.
 
 import { genAI, MODEL_NAME, withRetry, getErrorMessage, extractJsonObject } from './model';
 import type { VerificationResult } from '../../types';
