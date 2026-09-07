@@ -264,7 +264,7 @@ export default function SetPasswordPage() {
                         <button 
                           type="button"
                           tabIndex={-1}
-                          className={`w-4.5 h-4.5 rounded-md border-1.5 flex items-center justify-center shrink-0 mt-0.5 transition-all ${agreed ? "bg-vouch-red border-vouch-red" : "border-gray-300 bg-white hover:border-vouch-red"}`}
+                          className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all ${agreed ? "bg-vouch-red border-vouch-red" : "border-gray-500 bg-white hover:border-vouch-red"}`}
                         >
                           {agreed && <CheckCircle2 size={10} className="text-white" />}
                         </button>
