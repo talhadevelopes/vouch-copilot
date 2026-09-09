@@ -9,14 +9,14 @@ Vouch is architected as a pnpm monorepo managed by Turborepo. This allows for un
 ### Core Structure
 
 - apps/web: A Next.js 15 application using the App Router. It serves as the primary dashboard for users to manage their analysis history and run new reports via URL.
-- apps/api: A high-performance TypeScript API built with Hono and running on the Bun runtime. It handles all AI processing, authentication, and database operations.
-- apps/extension: A Manifest V3 Chrome Extension that provides the sidebar interface for real-time browsing analysis.
-- packages/sdk: A shared package containing the API client and authentication helpers used by both the web and extension apps to maintain a synchronized state.
+- apps/api: A TypeScript API built with Express and Node.js. It handles all AI processing, authentication, and database operations.
+- apps/sidebar: A Manifest V3 Chrome Extension that provides the sidebar interface for real-time browsing analysis.
+- packages/sdk: A shared package containing the API client and authentication helpers used by both the web and sidebar apps to maintain a synchronized state.
 - packages/types: A central location for all domain models and API request/response types, ensuring end-to-end type safety.
 
 ## Backend Architecture
 
-The backend is designed for high concurrency and low latency, leveraging the Bun runtime's speed and Hono's lightweight routing.
+The backend is designed for high concurrency and low latency, leveraging Express's mature ecosystem and Node.js runtime.
 
 ### AI Service Pipeline
 
@@ -36,9 +36,9 @@ Vouch uses Server-Sent Events (SSE) for streaming AI responses. This provides a 
 - Database: PostgreSQL (Neon) stores user profiles, persistent analysis history, and session tokens.
 - Caching: Upstash Redis is utilized for rate limiting and caching frequently accessed verification results.
 
-## Extension Architecture
+## Sidebar Architecture
 
-The Chrome Extension is a Manifest V3 application built with React 18 and Vite.
+The sidebar is a Manifest V3 Chrome Extension built with React 18 and Vite.
 
 ### Core Components
 
@@ -48,14 +48,14 @@ The Chrome Extension is a Manifest V3 application built with React 18 and Vite.
 
 ## Cross-Application Synchronization
 
-A key challenge in Vouch was synchronizing the authentication state between the standalone web dashboard and the browser extension.
+A key challenge in Vouch was synchronizing the authentication state between the standalone web dashboard and the browser sidebar.
 
 ### Linking Mechanism
 
 1. The user logs into the web dashboard.
 2. The user generates a secure 6-digit link code in their dashboard settings.
-3. The extension captures this code and exchanges it via the API for a valid JWT session.
-4. The packages/sdk maintains this session across both environments, ensuring that an analysis started in the extension is immediately visible in the web dashboard.
+3. The sidebar captures this code and exchanges it via the API for a valid JWT session.
+4. The packages/sdk maintains this session across both environments, ensuring that an analysis started in the sidebar is immediately visible in the web dashboard.
 
 ## Design Goals and Technical Benchmarks
 

@@ -4,7 +4,6 @@ This document provides instructions for setting up the Vouch development environ
 
 ## Prerequisites
 
-- Bun runtime (latest version)
 - Node.js (v18 or higher)
 - pnpm (package manager)
 - PostgreSQL database (or Neon account)
@@ -38,7 +37,7 @@ Create the following .env files based on the provided examples:
 - NEXT_PUBLIC_API_URL: Usually http://localhost:4000
 - NEXT_PUBLIC_GOOGLE_CLIENT_ID: For social login testing.
 
-### Extension (apps/extension/.env)
+### Sidebar (apps/sidebar/.env)
 - VITE_API_URL: Usually http://localhost:4000
 
 ## Running the Application
@@ -49,22 +48,22 @@ Vouch uses Turborepo to manage all services simultaneously.
 ```bash
 pnpm dev
 ```
-This command will start the API (port 4000), the Web Dashboard (port 3000), and the Extension build watcher.
+This command will start the API (port 4000), the Web Dashboard (port 3000), and the Sidebar build watcher.
 
 ### Database Management
 - Generate Prisma Client: `pnpm --filter @vouch/api prisma:generate`
 - Push Schema Changes: `pnpm --filter @vouch/api prisma:push`
 - Open Prisma Studio: `pnpm --filter @vouch/api db:studio`
 
-## Chrome Extension Setup
+## Sidebar Setup
 
-1. Build the extension: `pnpm --filter @vouch/extension build`
+1. Build the sidebar: `pnpm --filter @vouch/sidebar build`
 2. Open Chrome and navigate to `chrome://extensions/`
 3. Enable "Developer mode" in the top right.
-4. Click "Load unpacked" and select the `apps/extension/dist` directory.
+4. Click "Load unpacked" and select the `apps/sidebar/dist` directory.
 
 ## Project Standards
 
 - All new features should include Zod schema validation in the apps/api/src/validators directory.
-- Shared logic between the extension and web should be placed in packages/sdk.
+- Shared logic between the sidebar and web should be placed in packages/sdk.
 - Maintain strict TypeScript typing across all packages.

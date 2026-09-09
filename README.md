@@ -2,6 +2,14 @@
 
 Your Personalized AI companion for Browser-Native Intelligence.
 
+### System Design
+
+![Vouch System Design](./docs/system-design.png)
+
+> End-to-end architecture showing how the sidebar, web dashboard, Express API, AI pipeline, and data layer interact. See [Architecture Docs](./docs/ARCHITECTURE.md) for a written breakdown.
+
+---
+
 ### Live Links
 - Dashboard: https://vouch-copilot.vercel.app
 - Source Code: https://github.com/talhadevelopes/vouch-webcopilot
@@ -50,7 +58,7 @@ Vouch changes this completely. It works natively inside your browser. The AI aut
 ### Quick Start
 1. Open the Dashboard at https://vouch-copilot.vercel.app
 2. Go to login and click "Continue with Demo User"
-3. Try analysis directly on the dashboard or install the Chrome extension for the complete in-browser experience
+3. Try analysis directly on the dashboard or install the sidebar for the complete in-browser experience
 
 ### Documentation
 For more detailed technical information, please refer to the following documents in the docs directory:
@@ -65,8 +73,8 @@ For more detailed technical information, please refer to the following documents
 |------------------|--------------|
 | Monorepo         | Turborepo, pnpm |
 | Web Dashboard    | Next.js 15, React 18, Tailwind CSS, Framer Motion, Recharts |
-| Backend          | Bun, Hono, Prisma, PostgreSQL |
-| Chrome Extension | React 18, TypeScript, Vite, Chrome Extension APIs |
+| Backend          | Node.js, Express, Prisma, PostgreSQL |
+| Sidebar          | React 18, TypeScript, Vite, Chrome Extension APIs |
 | AI               | Google Gemini 1.5 Flash with search grounding |
 | Authentication   | JWT, Email/Password, Google OAuth, OTP |
 | Additional       | Server-Sent Events, Zod, Upstash Redis |

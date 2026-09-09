@@ -17,9 +17,9 @@ Vouch uses JWT-based authentication with Access and Refresh tokens.
 - GET /auth/me: Retrieve the currently authenticated user's profile information.
 - POST /auth/logout: Revoke tokens and terminate the current session.
 
-### Extension Linking
+### Sidebar Linking
 
-- POST /auth/extension/link-code: (Authenticated) Generate a 24-hour 6-digit code to link a browser extension.
+- POST /auth/extension/link-code: (Authenticated) Generate a 24-hour 6-digit code to link the browser sidebar.
 - POST /auth/extension/link-code/exchange: Exchange a valid link code for a full JWT session.
 
 ## AI Services
